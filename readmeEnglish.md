@@ -37,7 +37,7 @@ Required:
   <li>Arduino IDE 1.8.11</li>  
   <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
  </ul>
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyMCUMEesp81/main/preview/ttgovga32v12.jpg'></center> 
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TestVGA/main/preview/ttgovga32v12.jpg'></center> 
 
 
 <br><br>
@@ -66,7 +66,7 @@ It is all set up so you don't have to install the bitluni and fabgl libraries.
 <br><br>
 <h1>Arduino IDE</h1>
 The whole project is compatible with the Arduino 1.8.11 framework.
-We only have to open the <b>MECUMEesp81.ino</b> from the <b>testvga</b> directory.
+We only have to open the <b>testvga.ino</b> from the <b>testvga</b> directory.
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TestVGA/main/preview/previewArduinoIDEpreferences.gif'></center>
 We must install the spressif extensions in the additional card url manager <b>https://dl.espressif.com/dl/package_esp32_index.json</b>.<br>
 The project is now ready, so no bitluni or fabgl libraries are needed.
@@ -107,5 +107,5 @@ The <b>gbConfig.h</b> file options are selected:
 <br><br>
 <h1>DIY circuit</h1>
 If we don't want to use a TTGO VGA32 v1.x board, we can build it following the <b>fabgl</b> schematic:
-<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TinyMCUMEesp81/main/preview/fabglcircuit.gif'></center>
+<center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TestVGA/main/preview/fabglcircuit.gif'></center>
  
