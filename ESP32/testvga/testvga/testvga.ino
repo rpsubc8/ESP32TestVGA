@@ -13,18 +13,20 @@
 //#include "gb_sdl_font8x8.h"
 #include "gb_sdl_font6x8.h"
 
-//Uso solo RGB 3 bits DAC
-//static const unsigned char pin_config[] = {
-const unsigned char pin_config[]= {
- PIN_RED_HIGH,
- PIN_GREEN_HIGH,  
- PIN_BLUE_HIGH,
- 255,
- 255,
- 255,
- PIN_HSYNC,
- PIN_VSYNC      
-};
+#ifdef use_lib_vga8colors
+ //Uso solo RGB 3 bits DAC
+ //static const unsigned char pin_config[] = {
+ const unsigned char pin_config[]= {
+  PIN_RED_HIGH,
+  PIN_GREEN_HIGH,  
+  PIN_BLUE_HIGH,
+  255,
+  255,
+  255,
+  PIN_HSYNC,
+  PIN_VSYNC      
+ };
+#endif
 
 
 const unsigned char * gb_sdl_font= gb_sdl_font_6x8;

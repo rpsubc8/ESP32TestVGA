@@ -420,14 +420,21 @@ static unsigned char **alloc_framebuffer()
 
 static void clear_framebuffer(unsigned char **fb, uint8_t color)
 {
+ #ifdef use_lib_vga8colors
+  unsigned int clear_byte = sync_bits() | (color & 0x03);
+ #else
   unsigned int clear_byte = sync_bits() | (color & 0x3f);
+ #endif
   unsigned int clear_data = ((clear_byte << 24) |
                              (clear_byte << 16) |
                              (clear_byte <<  8) |
                              (clear_byte <<  0));
-  for (int y = 0; y < y_res(); y++) {
+  for (int y = 0; y < y_res(); y++) 
+  {
     unsigned int *line = (unsigned int *) fb[y];
-    for (int x = 0; x < x_res()/4; x++) {
+    //for (int x = 0; x < x_res()/4; x++) 
+    for (int x = 0; x < (h_pixels>>2); x++)
+    {
       line[x] = clear_data;
     }
   }
@@ -715,7 +722,10 @@ static void start_i2s_output()
 void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3)
 {
   //vga_mode = &mode;
-  Serial.printf("vga_init BEGIN\r\n");
+  #ifdef use_lib_log_serial
+   Serial.printf("vga_init BEGIN\r\n");
+   //Serial.printf("Sizeof framebuffer %d\r\n",sizeof(framebuffer)); //8 bytes
+  #endif 
 
   VgaMode_VgaMode(mode[0],mode[1],mode[2],mode[3],mode[4],mode[5],mode[6],mode[7],mode[8],mode[9],mode[10],mode[11]);
   pll_cte_force= pllcteforce; //force not calculate PLL
@@ -750,7 +760,9 @@ void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffere
   }
 #endif
 
- Serial.printf("vga_init END\r\n");
+ #ifdef use_lib_log_serial
+  Serial.printf("vga_init END\r\n");
+ #endif 
 }
 
 //Swap the back (drawing) and active (display) framebuffers.

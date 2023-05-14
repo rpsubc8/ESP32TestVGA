@@ -399,8 +399,14 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
      keyboard_uart_poll();
     
      if (checkKey_uart(KEY_CURSOR_LEFT)==1)
-     {
-      if (aReturn>10) aReturn-=10;
+     {      
+      if (aReturn>10){
+       aReturn-= 10;
+      }
+      else{
+       aReturn=0;
+      }
+      
       OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);
      }
      if (checkKey_uart(KEY_CURSOR_RIGHT)==1)
