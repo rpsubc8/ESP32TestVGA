@@ -1,4 +1,4 @@
-# Test VGA in ESP32
+# Test VGA ESP32
 Test de los modos de vídeo en ESP32 desde el menú utilizando el teclado PS/2 o teclado remoto a través de terminal, como Putty.
 <br>
 Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENTER para aceptar.
