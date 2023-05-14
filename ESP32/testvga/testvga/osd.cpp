@@ -38,7 +38,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 8
+#define max_gb_main_menu 13
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -46,6 +46,11 @@ const char * gb_main_menu[max_gb_main_menu]={
  "QVGA 320x240x60hz fabgl",
  "320x200x70hz bitluni",
  "320x200x70hz fabgl", 
+ "360x400x70.4hz bitluni", 
+ "400x300x56.2hz bitluni",
+ "320x350x70hz bitluni",
+ "320x400x70hz bitluni", 
+ "640x400x70hz bitluni",
  "Reset",
  "Return"
 };
@@ -221,21 +226,22 @@ void OSDMenuRowsDisplayScroll(const char **ptrValue,unsigned char currentId,unsi
  
  for (int i=0;i<gb_osd_max_rows;i++)
  {
-  if (currentId >= aMax)
+  if (currentId < aMax)
   {
-   memset(cadDest,32,30);
-   cadDest[26]='\0';
-   //SDLprintText(cadDest,gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
-   SDLprintText(cadDest,xOri,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
-   break;   
+   auxLen= strlen(ptrValue[currentId]);  
+   sprintf(cadDest,"%s",ptrValue[currentId]);
+   memset(&cadDest[auxLen],32,(30-auxLen));   
   }
-  auxLen= strlen(ptrValue[currentId]);  
-  sprintf(cadDest,"%s",ptrValue[currentId]);
-  memset(&cadDest[auxLen],32,(30-auxLen));
+  else
+  {
+   memset(cadDest,32,30);   
+  }
   cadDest[26]='\0';
+   
   //SDLprintText(ptrValue[currentId],gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
   //SDLprintText(cadDest,gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
   SDLprintText(cadDest,xOri,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
+
   currentId++;
  }     
 }
@@ -573,7 +579,47 @@ void do_tinyOSD()
     p3= 0x0005;
     gb_id_sel_video_mode= 5;
     break;
-   case 6:
+   case 6: 
+    //360x400 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_360x400;
+    gb_width= 360;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 6;   
+    break;
+   case 7: 
+    //400x300 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300;
+    gb_width= 400;
+    gb_height= 300;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 7;
+    break;    
+   case 8: 
+    //320x350 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x350;
+    gb_width= 320;
+    gb_height= 350;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 8;
+    break;    
+   case 9: 
+    //320x400 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x400;
+    gb_width= 320;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 9;
+    break; 
+   case 10: 
+    //640x400 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 10;
+    break;
+   case 11:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
