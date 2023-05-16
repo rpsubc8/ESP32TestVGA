@@ -14,6 +14,7 @@ Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENT
  <li>320x350x70hz bitluni</li>
  <li>320x400x70hz bitluni</li>
  <li>640x400x70hz bitluni</li>
+ <li>TTGOVGA32 PAL CVBS 5V (PAL CVBS GPIO 26)</li>
 </ul>
 
 
@@ -113,3 +114,43 @@ El archivo <b>gbConfig.h</b> se seleccionan las opciones:
 <h1>DIY circuito</h1>
 Si no queremos usar una placa TTGO VGA32 v1.x, podemos construirla siguiendo el esquema de <b>fabgl</b>:
 <center><img src='preview/fabglcircuit.gif'></center>
+Para el caso de querer salida de video cvbs, en lugar de VGA, debemos de sacar un cable directo del pin 26 del conector PS/2 del ratón, activando la opción <b>use_lib_cvbs_pal</b>, así como <b>use_lib_cvbs_ttgo_vga32</b> del <b>gbConfig.h</b>. Si no activamos dicha opción, la salida será de más de 1 voltio, teniendo que ser reducida con un reductor de voltaje (potenciómetro).
+<center><img src='preview/ps2.gif'></center>
+El conector de PS/2 es visto desde el propio jack de la placa, es decir, jack hembra. El pin en PS/2 es el CLK, es decir, el 5.
+<center><img src='preview/ttgops2cvbs.gif'></center>
+En esta imagen se puede ver el mosfet SOT23 interno de la placa TTGO VGA32, de manera, que la salida en CLK (pin 5) es 5 voltios.
+
+
+<br><br>
+<h1>Test DAC cvbs</h1>
+Para TTGO VGA32 como la salida es 5v, o hacemos reducción de voltaje o podemos reducir la escala del DAC. En 3.3v de salida, con máximo el valor de 77, ya nos daría 0.99v, que sería 1v. Si tenemos 5v de salida, con 50, ya tenemos 0.97v, que sería 1v. De esta forma, ya no necesitamos resistencias reductoras, es el cable directo. Mientras no nos pasemos de 77 en 3.3v o 50 en 5v, no tendremos problema, sobre todo si sólo necesitamos 2 colores (blanco y negro).
+Podemos hacer pruebas con un multímetro, sobre todo en la TTGO VGA32 v1.x:
+<pre>
+//ESP32 Pin 26
+//DAC - Voltaje
+//  0 - 0.06
+// 38 - 0.52
+// 77 - 1
+//255 - 3.17
+
+#include <Arduino.h>
+#include <driver/dac.h>
+
+const int arrayValue[4]={0,38,77,255};
+unsigned char cont=0;
+
+void setup() {
+ Serial.begin(115200);
+ dac_output_enable(DAC_CHANNEL_2);
+}
+
+void loop() {
+ dac_output_voltage(DAC_CHANNEL_2, arrayValue[cont]);
+ Serial.printf("%d\n",arrayValue[cont]);
+ delay(4000);
+ cont++;
+ cont &= 0x03;
+}
+</pre>
+Los valores máximos al escribir en el buffer de video en una placa ESP32 es de 54, mientras que para TTGO VGA32 v1.x sería de 35.
+
