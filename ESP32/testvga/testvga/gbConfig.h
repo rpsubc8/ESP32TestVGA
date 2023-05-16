@@ -73,6 +73,21 @@
  #define use_lib_log_serial 
 
  
+ //Usamos VGA y CVBS al mismo tiempo
+ #define use_lib_cvbs_bitluni
+
+ //No usamos backbuffer ahorramos RAM
+ #define use_lib_cvbs_bitluni_not_backbuffer
+
+ //mode PAL, NTSC for default
+ #define use_lib_cvbs_pal 
+
+ //Use DAC output 5 volts (not 3.2 volts) TTGO VGA32
+ #define use_lib_cvbs_ttgo_vga32
+ //Advertencia Usar alto brillo en DAC TTGO VGA32 5 volts (PreparaColorCVBS)
+ //El valor supera 1 voltio de la norma CVBS
+ //#define use_lib_cvbs_ttgo_vga32_bright  
+
 
  //Poll keyboard remote uart
  #define gb_current_ms_poll_keyboard_uart 50

@@ -421,7 +421,7 @@ static unsigned char **alloc_framebuffer()
 static void clear_framebuffer(unsigned char **fb, uint8_t color)
 {
  #ifdef use_lib_vga8colors
-  unsigned int clear_byte = sync_bits() | (color & 0x03);
+  unsigned int clear_byte = sync_bits() | (color & 0x07);
  #else
   unsigned int clear_byte = sync_bits() | (color & 0x3f);
  #endif
@@ -741,7 +741,10 @@ void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffere
   active_framebuffer = 0;
   back_framebuffer = (active_framebuffer+1) % num_framebuffers;
   clear_framebuffer(framebuffer[active_framebuffer], 0);
-  clear_framebuffer(framebuffer[back_framebuffer], 0);
+  if (num_framebuffers>1)
+  {//Solo tengo un buffer
+   clear_framebuffer(framebuffer[back_framebuffer], 0);
+  }
 
   allocate_vga_i2s_buffers();
   set_vga_i2s_active_framebuffer(framebuffer[active_framebuffer]);
@@ -834,20 +837,32 @@ int vga_get_y_res()
 
 void vga_free()
 {
- int auxY= vga_get_y_res();
+ unsigned int auxY= vga_get_y_res();
  Serial.printf("Free %d scanlines\r\n",auxY);
- for (int i = 0; i < auxY; i++)
+ if (framebuffer[0] != NULL)
  {
-  free(framebuffer[0][i]);
- }  
- free(framebuffer[0]);
+  for (unsigned int i = 0; i < auxY; i++)
+  {
+   free(framebuffer[0][i]);
+   framebuffer[0][i]= NULL;
+  }  
+  free(framebuffer[0]);
+  framebuffer[0]= NULL;
+ }
  
  free(dma_buf_hblank_vnorm);
+ dma_buf_hblank_vnorm= NULL;
  free(dma_buf_hblank_vsync);
+ dma_buf_hblank_vsync= NULL;
  free(dma_buf_vblank_vnorm);
+ dma_buf_vblank_vnorm= NULL;
  free(dma_buf_vblank_vsync);
+ dma_buf_vblank_vsync= NULL;
 
  free(dma_buf_desc);
+ dma_buf_desc= NULL;
+
+ back_framebuffer = active_framebuffer = 0;  
 }
 
 

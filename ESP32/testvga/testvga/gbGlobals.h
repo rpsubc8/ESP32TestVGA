@@ -16,6 +16,14 @@
  extern unsigned int **gb_buffer_vga32;
  extern unsigned char gb_sync_bits;
 
+ #ifdef use_lib_cvbs_bitluni
+  extern unsigned char **gb_buffer_cvbs;
+  extern unsigned int **gb_buffer_cvbs32;
+  extern unsigned char gb_color_cvbs[8];
+ #endif 
+
+ extern volatile unsigned char gb_cvbs_mode;
+
  extern volatile unsigned char keymap[256];
  extern volatile unsigned char oldKeymap[256];
 

@@ -50,6 +50,16 @@ unsigned char gb_show_osd_main_menu=1;
 
 unsigned char gb_id_sel_video_mode=0;
 
+#ifdef use_lib_cvbs_bitluni
+ unsigned char **gb_buffer_cvbs;
+ unsigned int **gb_buffer_cvbs32;
+ unsigned char gb_color_cvbs[8];
+#endif 
+
+volatile unsigned char gb_cvbs_mode=0;
+
+
+
 
 #ifdef use_lib_keyboard_uart
  unsigned int gb_curTime_keyboard_before_uart;
