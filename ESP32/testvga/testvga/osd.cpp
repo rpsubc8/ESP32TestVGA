@@ -33,7 +33,7 @@
  //Font<CompositeGraphics> font(6, 8, font6x8::pixels);
 
  void compositeCore(void *data);
- void PreparaColorCVBS(void);
+ void PreparaColorCVBS(unsigned char opcion);
  void SDLClearCVBS(void);
  void ShutDownCVBS(void);
 
@@ -42,33 +42,40 @@
    while (true)
    {
      //just send the graphics frontbuffer whithout any interruption 
-     if (gb_cvbs_mode==1)
-     {                
+     if ((gb_cvbs_mode==1)&&(gb_cvbs_shutdown==0))
+     {
       composite.sendFrameHalfResolution(&graphics.frame);
      }
    }  
  } 
 
- void PreparaColorCVBS()
+ void PreparaColorCVBS(unsigned char opcion)
  {
   gb_color_cvbs[0]= 0;
   for (int i=1;i<8;i++)
   {
-   #ifdef use_lib_cvbs_ttgo_vga32
-    //gb_color_cvbs[i] = 54;
-    #ifdef use_lib_cvbs_ttgo_vga32_bright
-     //Advertencia, no usar si no se esta seguro
-     //El valor supera 1 voltio de la norma CVBS
-     //gb_color_cvbs[i]= 45; //DAC 5v output 1v TTGO VGA32 High value WHITE maximo 45
-     gb_color_cvbs[i]= (i*6)+3; //45 maximo
-    #else
-     //gb_color_cvbs[i]= 35; //DAC 5v output 1v TTGO VGA32   maximo 35
-     gb_color_cvbs[i]= i*5; //maximo 35 7x5
-    #endif 
-   #else
-    gb_color_cvbs[i]= 54; //DAC 3.3v output 1v   maximo 54
-    gb_color_cvbs[i]= (i*7)+5; //maximo 35 7x7=49
-   #endif 
+   switch (opcion)
+   {
+    case 0: gb_color_cvbs[i]= i*5; break; //DAC 5v output 1v TTGO VGA32   maximo 35
+    case 1: gb_color_cvbs[i]= (i*6)+3; break; //DAC 5v output 1v TTGO VGA32 High value WHITE maximo 45    
+    case 2: gb_color_cvbs[i]= (i*7)+5; break; //DAC 3.3v output 1v   maximo 54
+   }
+
+   //#ifdef use_lib_cvbs_ttgo_vga32
+   // //gb_color_cvbs[i] = 54;
+   // #ifdef use_lib_cvbs_ttgo_vga32_bright
+   //  //Advertencia, no usar si no se esta seguro
+   //  //El valor supera 1 voltio de la norma CVBS
+   //  //gb_color_cvbs[i]= 45; //DAC 5v output 1v TTGO VGA32 High value WHITE maximo 45
+   //  gb_color_cvbs[i]= (i*6)+3; //45 maximo
+   // #else
+   //  //gb_color_cvbs[i]= 35; //DAC 5v output 1v TTGO VGA32   maximo 35
+   //  gb_color_cvbs[i]= i*5; //maximo 35 7x5
+   // #endif 
+   //#else
+   // //gb_color_cvbs[i]= 54; //DAC 3.3v output 1v   maximo 54
+   // gb_color_cvbs[i]= (i*7)+5; //maximo 35 7x7=49
+   //#endif 
   }
  } 
 
@@ -117,7 +124,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 14
+#define max_gb_main_menu 16
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -131,6 +138,8 @@ const char * gb_main_menu[max_gb_main_menu]={
  "320x400x70hz bitluni", 
  "640x400x70hz bitluni",
  "TTGOVGA32 PAL CVBS 5V",
+ "TTGOVGA32 PAL CVBS 5V+",
+ "ESP32 PAL CVBS 3V",
  "Reset",
  "Return"
 };
@@ -287,27 +296,39 @@ void ShowInfoVideoMode()
  char cadDest4[40];
  unsigned int p0,p1,p2,p3;
 
- LineHorizontal(0,gb_width,0x07);
- LineHorizontal((gb_height-1),gb_width,0x07);
+ if (gb_dibuja==1)
+ {
+  LineHorizontal(0,gb_width,0x07);
+  LineHorizontal((gb_height-1),gb_width,0x07);
 
- LineVertical(0,(gb_height-1),0x07);
- LineVertical((gb_width-1),(gb_height-1),0x07);
+  LineVertical(0,(gb_height-1),0x07);
+  LineVertical((gb_width-1),(gb_height-1),0x07);
 
- SDLprintText((char *)gb_main_menu[gb_id_sel_video_mode],(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  SDLprintText((char *)gb_main_menu[gb_id_sel_video_mode],(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+ }
  
  if (gb_cvbs_mode==0)
  {//vga
   row++;
   sprintf(cadDest0,"hf:%d hs:%d hb:%d hp:%d",gb_ptrVideo_cur[0],gb_ptrVideo_cur[1],gb_ptrVideo_cur[2],gb_ptrVideo_cur[3]);
-  SDLprintText(cadDest0,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  if (gb_dibuja==1)
+  {
+   SDLprintText(cadDest0,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  }
  
   row++;
   sprintf(cadDest1,"vf:%d vs:%d vb:%d vp:%d",gb_ptrVideo_cur[4],gb_ptrVideo_cur[5],gb_ptrVideo_cur[6],gb_ptrVideo_cur[7]);
-  SDLprintText(cadDest1,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  if (gb_dibuja==1)
+  {
+   SDLprintText(cadDest1,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  }
 
   row++;
   sprintf(cadDest2,"vd:%d pc:%d hp:%d vp:%d",gb_ptrVideo_cur[8],gb_ptrVideo_cur[9],gb_ptrVideo_cur[10],gb_ptrVideo_cur[11]);
-  SDLprintText(cadDest2,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK);
+  if (gb_dibuja==1)
+  {
+   SDLprintText(cadDest2,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK);
+  }
 
   row++;
   p0= vga_get_pll_cte_p0();
@@ -315,10 +336,16 @@ void ShowInfoVideoMode()
   p2= vga_get_pll_cte_p2();
   p3= vga_get_pll_cte_p3();
   sprintf(cadDest3,"p0:%08X p1:%08X",p0,p1);
-  SDLprintText(cadDest3,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  if (gb_dibuja==1)
+  {
+   SDLprintText(cadDest3,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+  }
   row++; 
   sprintf(cadDest4,"p2:%08X p3:%08X",p2,p3);
-  SDLprintText(cadDest4,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK);  
+  if (gb_dibuja==1)
+  {
+   SDLprintText(cadDest4,(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK);  
+  }
  }
 
  #ifdef use_lib_log_serial
@@ -484,10 +511,16 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
  curTime_keyboard= curTime_keyboard_before= millis();
 
  //WaitVsync();
- SDLClear();
+ if (gb_dibuja==1)
+ {
+  SDLClear();
+ }
  //WaitVsync();
  xOri= (gb_width - (unsigned int)(strlen(gb_cadTitle)<<3))>>1;
- SDLprintText(gb_cadTitle,xOri,(gb_pos_y_menu-16),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+ if (gb_dibuja==1)
+ {
+  SDLprintText(gb_cadTitle,xOri,(gb_pos_y_menu-16),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+ }
  //SDLprintText(gb_cadTitle,(gb_pos_x_menu-(32)),(gb_pos_y_menu-16),ID_COLOR_WHITE,ID_COLOR_BLACK); 
  //for (int i=0;i<14;i++)
  //{ 
@@ -500,12 +533,21 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
  cadTitulo[longitud]=' ';
  cadTitulo[26]='\0';
  xOri= (gb_width - (unsigned int)(strlen(cadTitulo)<<3))>>1;
- SDLprintText(cadTitulo,xOri,gb_pos_y_menu,ID_COLOR_BLACK,ID_COLOR_WHITE);
+ if (gb_dibuja==1)
+ {
+  SDLprintText(cadTitulo,xOri,gb_pos_y_menu,ID_COLOR_BLACK,ID_COLOR_WHITE);
+ }
  //SDLprintText(cadTitle,gb_pos_x_menu,gb_pos_y_menu,ID_COLOR_BLACK,ID_COLOR_WHITE);
  aReturn = (aSel!=-1)?aSel:0;
- OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);
+ if (gb_dibuja==1)
+ {
+  OSDMenuRowsDisplayScroll(ptrValue,aReturn,aMax);
+ }
 
- ShowInfoVideoMode();
+ if (gb_dibuja==1)
+ {
+  ShowInfoVideoMode();
+ }
  
  while (salir == 0)
  {             
@@ -615,15 +657,16 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
 
 TaskHandle_t gb_cvbsTaskHandle = NULL;
 
-void InitModoCVBS()
+void InitModoCVBS(unsigned char opcion)
 {
  #ifdef use_lib_log_serial
   Serial.printf("InitModoCVBS BEGIN\r\n");
  #endif
 
+ gb_cvbs_shutdown=1;
  //gb_cvbs_mode=0;
  delay(100);
-
+ 
  ShutDownCVBS();
 
  #ifdef use_lib_cvbs_bitluni 
@@ -637,13 +680,14 @@ void InitModoCVBS()
   xTaskCreatePinnedToCore(compositeCore, "compositeCoreTask", 1024, NULL, 1, &gb_cvbsTaskHandle, 0);
   gb_buffer_cvbs= (unsigned char **)graphics.backbuffer;
   gb_buffer_cvbs32= (unsigned int **)graphics.backbuffer;
-  PreparaColorCVBS();
+  PreparaColorCVBS(opcion);
   SDLClearCVBS();
   //SDLSetBorderCVBS();
   graphics.begin(0);
   graphics.fillRect(0, 0, 319, 199, 0);
   graphics.end();
   gb_cvbs_mode=1;
+  gb_cvbs_shutdown=0;
  #endif    
 
  #ifdef use_lib_log_serial
@@ -652,19 +696,21 @@ void InitModoCVBS()
 }
 
 void ShutDownCVBS()
-{
-   if (gb_cvbsTaskHandle != NULL)
-   {
-     #ifdef use_lib_log_serial
-      Serial.printf("CVBS task delete\r\n");
-     #endif 
-     vTaskDelete(gb_cvbsTaskHandle);     
-     delay(100);
-     gb_cvbsTaskHandle= NULL;
+{ 
+  composite.StopAll();
 
-     graphics.freeCompositeGraphicsCVBS(); //Libera scanlines
-     composite.freeCompositeOutputCVBS(); //Libera DMA     
-   }
+  if (gb_cvbsTaskHandle != NULL)
+  {
+    #ifdef use_lib_log_serial
+     Serial.printf("CVBS task delete\r\n");
+    #endif 
+    vTaskDelete(gb_cvbsTaskHandle);     
+    delay(100);
+    gb_cvbsTaskHandle= NULL;
+
+    graphics.freeCompositeGraphicsCVBS(); //Libera scanlines
+    composite.freeCompositeOutputCVBS(); //Libera DMA     
+  }
 }
 
 //*******************************************
@@ -692,7 +738,8 @@ void do_tinyOSD()
   unsigned int p2=0;
   unsigned int p3=0;  
 
-  aSelNum = ShowTinyMenu("Select Video Mode         ",gb_main_menu,max_gb_main_menu,gb_id_sel_video_mode);  
+  aSelNum = ShowTinyMenu("Select Video Mode         ",gb_main_menu,max_gb_main_menu,gb_id_sel_video_mode);      
+  gb_dibuja= 0;
   switch (aSelNum)
   {
    case 0:
@@ -802,31 +849,97 @@ void do_tinyOSD()
     gb_id_sel_video_mode= 10;
     break;
    case 11:
-    //modo cvbs PAL    
+    //modo cvbs PAL TTGO VGA32 5V poco brillo
     gb_id_sel_video_mode= 11;
     gb_width= 320;
-    gb_height= 200;   
-    SetVideoInterrupt(0);
-    delay(100);
-    vga_free();
-    delay(100);
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
 
-    vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
-    SetVideoInterrupt(1);
-    delay(100);
-    SetVideoInterrupt(0);
-    delay(100);
-    vga_free();
-    delay(100);
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
 
-    InitModoCVBS();
-    #ifdef use_lib_log_serial  
-     Serial.printf("Set Video %d\r\n",aSelNum);     
-     Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
-    #endif         
+     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+     SetVideoInterrupt(1);
+     delay(100);
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
+
+     InitModoCVBS(0); //TTGO VGA32 DAC 5v poco brillo
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
     break;    
-   
    case 12:
+    //modo cvbs PAL TTGO VGA32 5V mas brillo
+    gb_id_sel_video_mode= 12;
+    gb_width= 320;
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
+
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
+
+     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+     SetVideoInterrupt(1);
+     delay(100);
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
+
+     InitModoCVBS(1); //TTGO VGA32 DAC 5v mas brillo
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
+    break; 
+   case 13:
+    //modo cvbs PAL ESP32 3V
+    gb_id_sel_video_mode= 13;
+    gb_width= 320;
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
+
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
+
+     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+     SetVideoInterrupt(1);
+     delay(100);
+     SetVideoInterrupt(0);
+     delay(100);
+     vga_free();
+     delay(100);
+
+     InitModoCVBS(2); //ESP32 DAC 3v
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
+    break;     
+
+   case 14:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
@@ -834,35 +947,42 @@ void do_tinyOSD()
   }
 
   if (auxSetVideo == 1)
-  {
-   gb_cvbs_mode=0;
-   SetVideoInterrupt(0);
-   delay(100);
-   //int auxY= vga_get_y_res();
-   //Serial.printf("Free %d scanlines\r\n",auxY);
-   //for (int i = 0; i < auxY; i++)
-   //{
-   // free(gb_buffer_vga[i]);
-   //}
-   vga_free();
-
-   delay(100);
-   
-   ShutDownCVBS();
-
-   vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3);
-   SetVideoInterrupt(1);
-
-   gb_sync_bits= vga_get_sync_bits();
-   gb_buffer_vga = vga_get_framebuffer();
-   gb_buffer_vga32=(unsigned int **)gb_buffer_vga;
-   PrepareColorsBitluniVGA(); //Llamar despues de tener gb_sync_bits 
+  {   
+   if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+   {
+    gb_id_sel_video_mode_prev = gb_id_sel_video_mode;
+    gb_dibuja= 1; //le toca redibujar
       
-   SDLClear();
-   #ifdef use_lib_log_serial  
-    Serial.printf("Set Video %d\r\n",aSelNum);     
-    Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
-   #endif   
+    gb_cvbs_mode=0;
+    gb_cvbs_shutdown=1;
+    SetVideoInterrupt(0);
+    delay(100);
+    //int auxY= vga_get_y_res();
+    //Serial.printf("Free %d scanlines\r\n",auxY);
+    //for (int i = 0; i < auxY; i++)
+    //{
+    // free(gb_buffer_vga[i]);
+    //}
+    vga_free();
+
+    delay(100);
+   
+    ShutDownCVBS();
+
+    vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3);
+    SetVideoInterrupt(1);
+
+    gb_sync_bits= vga_get_sync_bits();
+    gb_buffer_vga = vga_get_framebuffer();
+    gb_buffer_vga32=(unsigned int **)gb_buffer_vga;
+    PrepareColorsBitluniVGA(); //Llamar despues de tener gb_sync_bits 
+      
+    SDLClear();
+    #ifdef use_lib_log_serial  
+     Serial.printf("Set Video %d\r\n",aSelNum);     
+     Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+    #endif   
+   }//fin if es distinto modo video
   }
  }
 

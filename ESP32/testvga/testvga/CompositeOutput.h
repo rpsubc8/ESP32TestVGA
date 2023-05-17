@@ -197,6 +197,10 @@ class CompositeOutput
   }
  }
 
+ void StopAll()
+ {
+  i2s_driver_uninstall(I2S_PORT);
+ }
 
   void init()
   {

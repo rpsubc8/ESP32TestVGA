@@ -23,6 +23,7 @@
  #endif 
 
  extern volatile unsigned char gb_cvbs_mode;
+ extern volatile unsigned char gb_cvbs_shutdown;
 
  extern volatile unsigned char keymap[256];
  extern volatile unsigned char oldKeymap[256];
@@ -49,6 +50,9 @@
  extern unsigned short int gb_height; 
 
  extern unsigned char gb_id_sel_video_mode;
+ extern unsigned char gb_id_sel_video_mode_prev; 
+
+ extern unsigned char gb_dibuja;
 
 #endif
 

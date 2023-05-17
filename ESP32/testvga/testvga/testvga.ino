@@ -49,6 +49,8 @@ unsigned short int gb_height;
 unsigned char gb_show_osd_main_menu=1;
 
 unsigned char gb_id_sel_video_mode=0;
+unsigned char gb_id_sel_video_mode_prev=0;
+unsigned char gb_dibuja=1; //Solucion rapida.Hay que quitar
 
 #ifdef use_lib_cvbs_bitluni
  unsigned char **gb_buffer_cvbs;
@@ -57,6 +59,7 @@ unsigned char gb_id_sel_video_mode=0;
 #endif 
 
 volatile unsigned char gb_cvbs_mode=0;
+volatile unsigned char gb_cvbs_shutdown=1;
 
 
 
@@ -114,6 +117,9 @@ void setup()
  #ifdef use_lib_keyboard_uart
   Serial.setTimeout(use_lib_keyboard_uart_timeout);
  #endif
+
+ gb_cvbs_mode=0;
+ gb_cvbs_shutdown=1;
 
  vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
  gb_ptrVideo_cur= VgaMode_vga_mode_360x200;
