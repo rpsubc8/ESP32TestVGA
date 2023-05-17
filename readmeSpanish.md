@@ -15,6 +15,8 @@ Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENT
  <li>320x400x70hz bitluni</li>
  <li>640x400x70hz bitluni</li>
  <li>TTGOVGA32 PAL CVBS 5V (PAL CVBS GPIO 26)</li>
+ <li>TTGOVGA32 PAL CVBS 5V+ (PAL CVBS GPIO 26)</li>
+ <li>ESP32 PAL CVBS 3V (PAL CVBS GPIO 26)</li>
 </ul>
 
 
