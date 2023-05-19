@@ -17,6 +17,9 @@ Select the video mode with the up and down arrow keys and press ENTER to accept.
  <li>TTGOVGA32 PAL CVBS 5V (PAL CVBS GPIO 26)</li>
  <li>TTGOVGA32 PAL CVBS 5V+ (PAL CVBS GPIO 26)</li>
  <li>ESP32 PAL CVBS 3V (PAL CVBS GPIO 26)</li>
+ <li>TTGOVGA32 NTSC CVBS 5V (NTSC CVBS GPIO 26)</li>
+ <li>TTGOVGA32 NTSC CVBS 5V+ (NTSC CVBS GPIO 26)</li>
+ <li>ESP32 NTSC CVBS 3V (NTSC CVBS GPIO 26)</li>
 </ul>
  
 <br><br>
