@@ -44,7 +44,7 @@ const TechProperties PALProperties = {
   .imageAspect = 4./3.
 };
 
-const TechProperties NTSCProperties = {
+ const TechProperties NTSCProperties = {
   .lineMicros = 63.492,
   .syncMicros = 4.7,
   .blankEndMicros = 9.2,
@@ -163,25 +163,102 @@ class CompositeOutput
     pixelAspect = (float(samplesActive) / (linesEvenVisible + linesOddVisible)) / properties.imageAspect;
   }
 
- //void SetModeNTSC()
- //{
- // properties.lineMicros = NTSCProperties.lineMicros;
- // properties.syncMicros = NTSCProperties.syncMicros;
- // properties.blankEndMicros = NTSCProperties.blankEndMicros;
- // properties.backMicros = NTSCProperties..backMicros;
- // properties.shortVSyncMicros = NTSCProperties.shortVSyncMicros;
- // properties.overscanLeftMicros = NTSCProperties.overscanLeftMicros; 
- // properties.overscanRightMicros = NTSCProperties.overscanRightMicros; 
- // properties.syncVolts = NTSCProperties.syncVolts; 
- // properties.blankVolts = NTSCProperties.blankVolts; 
- // properties.blackVolts = NTSCProperties.blackVolts;
- // properties.whiteVolts = NTSCProperties.whiteVolts;
- // properties.lines = NTSCProperties.lines;
- // properties.linesFirstTop = NTSCProperties.linesFirstTop;
- // properties.linesOverscanTop = NTSCProperties.linesOverscanTop;
- // properties.linesOverscanBottom = NTSCProperties.linesOverscanBottom;
- // properties.imageAspect = NTSCProperties.imageAspect;
- //}
+  //void SetModeCustom(Mode mode, int xres, int yres, double Vcc = 5)
+  void SetModeNTSC(int xres, int yres,double Vcc)
+  {       
+    //#ifdef use_lib_log_serial
+    // Serial.printf("SetModeNTSC\r\n");
+    //#endif
+    int linesSyncTop = 5;
+    int linesSyncBottom = 3;
+
+    linesOdd = NTSCProperties.lines / 2;
+    linesEven = NTSCProperties.lines - linesOdd;
+    linesEvenActive = linesEven - NTSCProperties.linesFirstTop - linesSyncBottom;
+    linesOddActive = linesOdd - NTSCProperties.linesFirstTop - linesSyncBottom;
+    linesEvenVisible = linesEvenActive - NTSCProperties.linesOverscanTop - NTSCProperties.linesOverscanBottom; 
+    linesOddVisible = linesOddActive - NTSCProperties.linesOverscanTop - NTSCProperties.linesOverscanBottom;
+
+    targetYresOdd = (yres / 2 < linesOddVisible) ? yres / 2 : linesOddVisible;
+    targetYresEven = (yres - targetYresOdd < linesEvenVisible) ? yres - targetYresOdd : linesEvenVisible;
+    targetYres = targetYresEven + targetYresOdd;
+    
+    linesEvenBlankTop = NTSCProperties.linesFirstTop - linesSyncTop + NTSCProperties.linesOverscanTop + (linesEvenVisible - targetYresEven) / 2;
+    linesEvenBlankBottom = linesEven - linesEvenBlankTop - targetYresEven - linesSyncBottom;
+    linesOddBlankTop = linesEvenBlankTop;
+    linesOddBlankBottom = linesOdd - linesOddBlankTop - targetYresOdd - linesSyncBottom;
+    
+    double samplesPerSecond = 160000000.0 / 3.0 / 2.0 / 2.0;
+    double samplesPerMicro = samplesPerSecond * 0.000001;
+    samplesLine = (int)(samplesPerMicro * NTSCProperties.lineMicros + 1.5) & ~1;
+    samplesSync = samplesPerMicro * NTSCProperties.syncMicros + 0.5;
+    samplesBlank = samplesPerMicro * (NTSCProperties.blankEndMicros - NTSCProperties.syncMicros + NTSCProperties.overscanLeftMicros) + 0.5;
+    samplesBack = samplesPerMicro * (NTSCProperties.backMicros + NTSCProperties.overscanRightMicros) + 0.5;
+    samplesActive = samplesLine - samplesSync - samplesBlank - samplesBack;
+
+    targetXres = xres < samplesActive ? xres : samplesActive;
+
+    samplesVSyncShort = samplesPerMicro * NTSCProperties.shortVSyncMicros + 0.5;
+    samplesBlackLeft = (samplesActive - targetXres) / 2;
+    samplesBlackRight = samplesActive - targetXres - samplesBlackLeft;
+    double dacPerVolt = 255.0 / Vcc;
+    levelSync = 0;
+    levelBlank = (NTSCProperties.blankVolts - NTSCProperties.syncVolts) * dacPerVolt + 0.5;
+    levelBlack = (NTSCProperties.blackVolts - NTSCProperties.syncVolts) * dacPerVolt + 0.5;
+    levelWhite = (NTSCProperties.whiteVolts - NTSCProperties.syncVolts) * dacPerVolt + 0.5;
+    grayValues = levelWhite - levelBlack + 1;
+
+    pixelAspect = (float(samplesActive) / (linesEvenVisible + linesOddVisible)) / NTSCProperties.imageAspect;
+  }
+
+  void SetModePAL(int xres, int yres,double Vcc)
+  {       
+    //#ifdef use_lib_log_serial
+    // Serial.printf("SetModePAL\r\n");
+    //#endif
+
+    int linesSyncTop = 5;
+    int linesSyncBottom = 3;
+
+    linesOdd = PALProperties.lines / 2;
+    linesEven = PALProperties.lines - linesOdd;
+    linesEvenActive = linesEven - PALProperties.linesFirstTop - linesSyncBottom;
+    linesOddActive = linesOdd - PALProperties.linesFirstTop - linesSyncBottom;
+    linesEvenVisible = linesEvenActive - PALProperties.linesOverscanTop - PALProperties.linesOverscanBottom; 
+    linesOddVisible = linesOddActive - PALProperties.linesOverscanTop - PALProperties.linesOverscanBottom;
+
+    targetYresOdd = (yres / 2 < linesOddVisible) ? yres / 2 : linesOddVisible;
+    targetYresEven = (yres - targetYresOdd < linesEvenVisible) ? yres - targetYresOdd : linesEvenVisible;
+    targetYres = targetYresEven + targetYresOdd;
+    
+    linesEvenBlankTop = PALProperties.linesFirstTop - linesSyncTop + PALProperties.linesOverscanTop + (linesEvenVisible - targetYresEven) / 2;
+    linesEvenBlankBottom = linesEven - linesEvenBlankTop - targetYresEven - linesSyncBottom;
+    linesOddBlankTop = linesEvenBlankTop;
+    linesOddBlankBottom = linesOdd - linesOddBlankTop - targetYresOdd - linesSyncBottom;
+    
+    double samplesPerSecond = 160000000.0 / 3.0 / 2.0 / 2.0;
+    double samplesPerMicro = samplesPerSecond * 0.000001;
+    samplesLine = (int)(samplesPerMicro * PALProperties.lineMicros + 1.5) & ~1;
+    samplesSync = samplesPerMicro * PALProperties.syncMicros + 0.5;
+    samplesBlank = samplesPerMicro * (PALProperties.blankEndMicros - PALProperties.syncMicros + PALProperties.overscanLeftMicros) + 0.5;
+    samplesBack = samplesPerMicro * (PALProperties.backMicros + PALProperties.overscanRightMicros) + 0.5;
+    samplesActive = samplesLine - samplesSync - samplesBlank - samplesBack;
+
+    targetXres = xres < samplesActive ? xres : samplesActive;
+
+    samplesVSyncShort = samplesPerMicro * PALProperties.shortVSyncMicros + 0.5;
+    samplesBlackLeft = (samplesActive - targetXres) / 2;
+    samplesBlackRight = samplesActive - targetXres - samplesBlackLeft;
+    double dacPerVolt = 255.0 / Vcc;
+    levelSync = 0;
+    levelBlank = (PALProperties.blankVolts - PALProperties.syncVolts) * dacPerVolt + 0.5;
+    levelBlack = (PALProperties.blackVolts - PALProperties.syncVolts) * dacPerVolt + 0.5;
+    levelWhite = (PALProperties.whiteVolts - PALProperties.syncVolts) * dacPerVolt + 0.5;
+    grayValues = levelWhite - levelBlack + 1;
+
+    pixelAspect = (float(samplesActive) / (linesEvenVisible + linesOddVisible)) / PALProperties.imageAspect;
+  }
+
 
  void freeCompositeOutputCVBS()
  {

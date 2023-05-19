@@ -54,6 +54,9 @@
 
  extern unsigned char gb_dibuja;
 
+ #define CVBS_MODE_PAL 0
+ #define CVBS_MODE_NTSC 1
+
 #endif
 
 

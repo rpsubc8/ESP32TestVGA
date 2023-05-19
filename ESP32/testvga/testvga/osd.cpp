@@ -56,9 +56,9 @@
   {
    switch (opcion)
    {
-    case 0: gb_color_cvbs[i]= i*5; break; //DAC 5v output 1v TTGO VGA32   maximo 35
-    case 1: gb_color_cvbs[i]= (i*6)+3; break; //DAC 5v output 1v TTGO VGA32 High value WHITE maximo 45    
-    case 2: gb_color_cvbs[i]= (i*7)+5; break; //DAC 3.3v output 1v   maximo 54
+    case 0: case 3: gb_color_cvbs[i]= i*5; break; //DAC 5v output 1v TTGO VGA32   maximo 35
+    case 1: case 4: gb_color_cvbs[i]= (i*6)+3; break; //DAC 5v output 1v TTGO VGA32 High value WHITE maximo 45    
+    case 2: case 5: gb_color_cvbs[i]= (i*7)+5; break; //DAC 3.3v output 1v   maximo 54
    }
 
    //#ifdef use_lib_cvbs_ttgo_vga32
@@ -124,7 +124,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 16
+#define max_gb_main_menu 18
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -140,8 +140,10 @@ const char * gb_main_menu[max_gb_main_menu]={
  "TTGOVGA32 PAL CVBS 5V",
  "TTGOVGA32 PAL CVBS 5V+",
  "ESP32 PAL CVBS 3V",
- "Reset",
- "Return"
+ "TTGOVGA32 NTSC CVBS 5V",
+ "TTGOVGA32 NTSC CVBS 5V+",
+ "ESP32 NTSC CVBS 3V",
+ "Reset" 
 };
 
 
@@ -657,17 +659,41 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
 
 TaskHandle_t gb_cvbsTaskHandle = NULL;
 
-void InitModoCVBS(unsigned char opcion)
+void InitModoCVBS(unsigned char opcion, unsigned char modoPALNTSC, double Vcc)
 {
  #ifdef use_lib_log_serial
   Serial.printf("InitModoCVBS BEGIN\r\n");
  #endif
+
+ SetVideoInterrupt(0);
+ delay(100);
+ vga_free();
+ delay(100);
+
+ vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+ SetVideoInterrupt(1);
+ delay(100);
+ SetVideoInterrupt(0);
+ delay(100);
+ vga_free();
+ delay(100);
+
+
 
  gb_cvbs_shutdown=1;
  //gb_cvbs_mode=0;
  delay(100);
  
  ShutDownCVBS();
+ switch(modoPALNTSC)
+ {
+  case CVBS_MODE_PAL:   
+   composite.SetModePAL((XRES<<1),(YRES<<1),Vcc);   
+   break;
+  case CVBS_MODE_NTSC:    
+   composite.SetModeNTSC((XRES<<1),(YRES<<1),Vcc);
+   break;
+ }
 
  #ifdef use_lib_cvbs_bitluni 
   esp_pm_lock_handle_t powerManagementLock;
@@ -857,21 +883,8 @@ void do_tinyOSD()
     {
      gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
      gb_dibuja= 1; //le toca redibujar
-
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
-     SetVideoInterrupt(1);
-     delay(100);
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     InitModoCVBS(0); //TTGO VGA32 DAC 5v poco brillo
+     
+     InitModoCVBS(0,CVBS_MODE_PAL,5); //TTGO VGA32 DAC 5v poco brillo
      #ifdef use_lib_log_serial  
       Serial.printf("Set Video %d\r\n",aSelNum);     
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
@@ -879,7 +892,7 @@ void do_tinyOSD()
     }
     break;    
    case 12:
-    //modo cvbs PAL TTGO VGA32 5V mas brillo
+    //modo cvbs PAL TTGO VGA32 5V mas brillo    
     gb_id_sel_video_mode= 12;
     gb_width= 320;
     gb_height= 200;
@@ -888,20 +901,7 @@ void do_tinyOSD()
      gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
      gb_dibuja= 1; //le toca redibujar
 
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
-     SetVideoInterrupt(1);
-     delay(100);
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     InitModoCVBS(1); //TTGO VGA32 DAC 5v mas brillo
+     InitModoCVBS(1,CVBS_MODE_PAL,5); //TTGO VGA32 DAC 5v mas brillo
      #ifdef use_lib_log_serial  
       Serial.printf("Set Video %d\r\n",aSelNum);     
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
@@ -918,28 +918,66 @@ void do_tinyOSD()
      gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
      gb_dibuja= 1; //le toca redibujar
 
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
-     SetVideoInterrupt(1);
-     delay(100);
-     SetVideoInterrupt(0);
-     delay(100);
-     vga_free();
-     delay(100);
-
-     InitModoCVBS(2); //ESP32 DAC 3v
+     InitModoCVBS(2,CVBS_MODE_PAL,3.3); //ESP32 DAC 3v
      #ifdef use_lib_log_serial  
       Serial.printf("Set Video %d\r\n",aSelNum);     
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
      #endif         
     }
     break;     
+   case 14:    
+    //modo cvbs NTSC TTGO VGA32 5V poco brillo
+    gb_id_sel_video_mode= 14;
+    gb_width= 320;
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
 
-   case 14:
+     InitModoCVBS(3,CVBS_MODE_NTSC,5); //TTGO VGA32 5V NTSC poco brillo
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
+    break;     
+   case 15:    
+    //modo cvbs NTSC TTGO VGA32 5V+ mas brillo
+    gb_id_sel_video_mode= 15;
+    gb_width= 320;
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
+
+     InitModoCVBS(4,CVBS_MODE_NTSC,5); //TTGO VGA32 5V+ NTSC mas brillo
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
+    break;    
+   case 16:    
+    //modo cvbs NTSC ESP32 3V
+    gb_id_sel_video_mode= 16;
+    gb_width= 320;
+    gb_height= 200;
+    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
+    {
+     gb_id_sel_video_mode_prev= gb_id_sel_video_mode;
+     gb_dibuja= 1; //le toca redibujar
+
+     InitModoCVBS(5,CVBS_MODE_NTSC,3.3); //ESP32 NTSC 3.3V
+     #ifdef use_lib_log_serial  
+      Serial.printf("Set Video %d\r\n",aSelNum);     
+      Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
+     #endif         
+    }
+    break;        
+
+   case 17:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
