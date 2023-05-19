@@ -17,6 +17,9 @@ Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENT
  <li>TTGOVGA32 PAL CVBS 5V (PAL CVBS GPIO 26)</li>
  <li>TTGOVGA32 PAL CVBS 5V+ (PAL CVBS GPIO 26)</li>
  <li>ESP32 PAL CVBS 3V (PAL CVBS GPIO 26)</li>
+ <li>TTGOVGA32 NTSC CVBS 5V (NTSC CVBS GPIO 26)</li>
+ <li>TTGOVGA32 NTSC CVBS 5V+ (NTSC CVBS GPIO 26)</li>
+ <li>ESP32 NTSC CVBS 3V (NTSC CVBS GPIO 26)</li>
 </ul>
 
 
