@@ -2,9 +2,9 @@
 Test VGA in ESP32
 
 <ul>
- <li><a href='https://discord.gg/2mRgdjXRKB'><b>Discord:</b> https://discord.gg/2mRgdjXRKB</a></li>
- <li><a href='https://www.youtube.com/@ackerman3754'><b>Youtube:</b> https://www.youtube.com/@ackerman3754</a></li>
- <li><a href='https://retrowiki.es/viewforum.php?f=114'><b>Forum: </b>https://retrowiki.es/viewforum.php?f=114</a></li>
+ <li><b>Discord:</b><a href='https://discord.gg/2mRgdjXRKB'>https://discord.gg/2mRgdjXRKB</a></li>
+ <li><b>Youtube:</b><a href='https://www.youtube.com/@ackerman3754'>https://www.youtube.com/@ackerman3754</a></li>
+ <li><b>Forum: </b><a href='https://retrowiki.es/viewforum.php?f=114'>https://retrowiki.es/viewforum.php?f=114</a></li>
 </ul>
 
 <br><br>
