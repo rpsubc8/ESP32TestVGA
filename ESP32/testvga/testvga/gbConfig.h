@@ -8,7 +8,7 @@
  //#define use_lib_debug_i2s
 
  //Use terminal keyboard, putty
- //#define use_lib_keyboard_uart
+ #define use_lib_keyboard_uart
  
  //timeout read millis
  #define use_lib_keyboard_uart_timeout 0
