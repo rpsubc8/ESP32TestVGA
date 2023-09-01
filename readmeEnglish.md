@@ -20,6 +20,8 @@ Select the video mode with the up and down arrow keys and press ENTER to accept.
  <li>TTGOVGA32 NTSC CVBS 5V (NTSC CVBS GPIO 26)</li>
  <li>TTGOVGA32 NTSC CVBS 5V+ (NTSC CVBS GPIO 26)</li>
  <li>ESP32 NTSC CVBS 3V (NTSC CVBS GPIO 26)</li>
+ <li>320x240x60hz bitluni PLL</li>
+ <li>320x200x70hz bitluni PLL</li>
 </ul>
  
 <br><br>
