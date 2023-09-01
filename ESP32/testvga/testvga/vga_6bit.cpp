@@ -197,9 +197,23 @@
 #endif
 
 #include "vga_6bit.h"
+#include "driver/i2c.h" // i2c_rtc_clk.h"
+
+//BEGIN PLL
+//#include <esp_heap_caps.h>
+//#include <soc/rtc.h>
+//#include <soc/i2s_reg.h>
+//#include <soc/i2s_struct.h>
+//#include <soc/io_mux_reg.h>
+//#include <driver/rtc_io.h>
+//#include <driver/gpio.h>
+//#include <driver/periph_ctrl.h>
+#include "regi2c_ctrl.h"
+//END PLL
 
 
 unsigned char pll_cte_force=0; //Forzar el uso de PLL constante
+unsigned char pll_custom_force=0; //Forzar uso de custom_rtc_clk_apll_enable
 unsigned int pll_cte_p0;
 unsigned int pll_cte_p1;
 unsigned int pll_cte_p2;
@@ -218,6 +232,82 @@ int v_div;
 int pixel_clock;
 unsigned char h_polarity;
 unsigned char v_polarity;
+
+
+
+ #define APLL_SDM_STOP_VAL_2_REV1 0x49
+ #define APLL_SDM_STOP_VAL_2_REV0 0x69
+ #define APLL_SDM_STOP_VAL_1 0x09
+ #define APLL_CAL_DELAY_1 0x0f
+ #define APLL_CAL_DELAY_2 0x3f
+ #define APLL_CAL_DELAY_3 0x1f
+ #define EFUSE_BLK0_RDATA3_REG (DR_REG_EFUSE_BASE + 0x00c)
+ #define I2C_APLL 0X6D
+ #define I2C_APLL_DSDM2 7
+ #define I2C_APLL_DSDM0 9
+ #define I2C_APLL_DSDM1 8
+ #define I2C_APLL_SDM_STOP 5
+ #define I2C_APLL_OR_OUTPUT_DIV 4
+ #define I2C_APLL_IR_CAL_DELAY 0
+ #define I2C_APLL_OR_CAL_END 3
+
+ #define I2C_WRITEREG_MASK_RTC(block, reg_add, indata) \
+      rom_i2c_writeReg_Mask(block, block##_HOSTID,  reg_add,  reg_add##_MSB,  reg_add##_LSB,  indata)
+
+ #define I2C_READREG_MASK_RTC(block, reg_add) \
+      rom_i2c_readReg_Mask(block, block##_HOSTID,  reg_add,  reg_add##_MSB,  reg_add##_LSB)
+
+ #define I2C_WRITEREG_RTC(block, reg_add, indata) \
+      rom_i2c_writeReg(block, block##_HOSTID,  reg_add, indata)
+
+ void custom_rtc_clk_apll_enable(bool enable, uint32_t sdm0, uint32_t sdm1, uint32_t sdm2, uint32_t o_div)
+ {  
+  REG_SET_FIELD(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PLLA_FORCE_PD, enable ? 0 : 1);
+  REG_SET_FIELD(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PLLA_FORCE_PU, enable ? 1 : 0);
+ 
+  if (!enable && REG_GET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL) != RTC_CNTL_SOC_CLK_SEL_PLL)
+  {
+   REG_SET_BIT(RTC_CNTL_OPTIONS0_REG, RTC_CNTL_BIAS_I2C_FORCE_PD);
+  }
+  else
+  {
+   REG_CLR_BIT(RTC_CNTL_OPTIONS0_REG, RTC_CNTL_BIAS_I2C_FORCE_PD);
+  }
+ 
+  if (enable)
+  {
+   uint8_t sdm_stop_val_2 = APLL_SDM_STOP_VAL_2_REV1;
+   uint32_t is_rev0 = (GET_PERI_REG_BITS2(EFUSE_BLK0_RDATA3_REG, 1, 15) == 0);
+   if (is_rev0) 
+   {
+    sdm0 = 0;
+    sdm1 = 0;
+    sdm_stop_val_2 = APLL_SDM_STOP_VAL_2_REV0;
+   }
+   
+   I2C_WRITEREG_MASK_RTC(I2C_APLL, I2C_APLL_DSDM2, sdm2);
+   I2C_WRITEREG_MASK_RTC(I2C_APLL, I2C_APLL_DSDM0, sdm0);
+   I2C_WRITEREG_MASK_RTC(I2C_APLL, I2C_APLL_DSDM1, sdm1);
+   I2C_WRITEREG_RTC(I2C_APLL, I2C_APLL_SDM_STOP, APLL_SDM_STOP_VAL_1);
+   I2C_WRITEREG_RTC(I2C_APLL, I2C_APLL_SDM_STOP, sdm_stop_val_2);
+   I2C_WRITEREG_MASK_RTC(I2C_APLL, I2C_APLL_OR_OUTPUT_DIV, o_div);
+   
+   //Quito calibracion
+   ////calibration   
+   //I2C_WRITEREG_RTC(I2C_APLL, I2C_APLL_IR_CAL_DELAY, APLL_CAL_DELAY_1);
+   //I2C_WRITEREG_RTC(I2C_APLL, I2C_APLL_IR_CAL_DELAY, APLL_CAL_DELAY_2);
+   //I2C_WRITEREG_RTC(I2C_APLL, I2C_APLL_IR_CAL_DELAY, APLL_CAL_DELAY_3); 
+ 
+   ////wait for calibration end   
+   //while (!(I2C_READREG_MASK_RTC(I2C_APLL, I2C_APLL_OR_CAL_END)))
+   //{
+   // //use ets_delay_us so the RTC bus doesn't get flooded
+   // ets_delay_us(1);
+   //}      
+  }
+  //Serial.printf("Custom PLL call\r\n");
+ }
+
 
 void VgaMode_VgaMode(int hf, int hs, int hb, int hpix,
           int vf, int vs, int vb, int vpix,
@@ -580,7 +670,14 @@ static void setup_i2s_output(const unsigned char *pin_map)
     Serial.printf("bitluni p0:0x%04X p1:0x%04X p2:0x%04X p3:0x%04X \r\n",p0,p1,p2,p3);
    #endif
 
-   rtc_clk_apll_enable(true, p0, p1, p2, p3);
+   if (pll_custom_force==0)
+   {
+    rtc_clk_apll_enable(true, p0, p1, p2, p3);
+   }
+   else
+   {
+    custom_rtc_clk_apll_enable(true, p0, p1, p2, p3);
+   }
    //Hay que revisar el swgenerator.cpp - play - setupClock si se usa sonido
    //Prepara rtc_clk_apll_enable con precision doble, pero no se usa
   #else
@@ -607,7 +704,14 @@ static void setup_i2s_output(const unsigned char *pin_map)
     pll_cte_p1= ((sdm >> 8) & 0xff);
     pll_cte_p2= (sdm >> 16);
     pll_cte_p3= odir;
-    rtc_clk_apll_enable(true, sdm & 0xff, (sdm >> 8) & 0xff, sdm >> 16, odir);
+    if (pll_custom_force==0)
+    {
+     rtc_clk_apll_enable(true, sdm & 0xff, (sdm >> 8) & 0xff, sdm >> 16, odir);
+    }
+    else
+    {
+     custom_rtc_clk_apll_enable(true, sdm & 0xff, (sdm >> 8) & 0xff, sdm >> 16, odir);
+    }
    } 
    else   
    {
@@ -617,7 +721,14 @@ static void setup_i2s_output(const unsigned char *pin_map)
     unsigned int p2= pll_cte_p2;
     unsigned int p3= pll_cte_p3;
     Serial.printf("bitluni p0:0x%04X p1:0x%04X p2:0x%04X p3:0x%04X \r\n",p0,p1,p2,p3);
-    rtc_clk_apll_enable(true, p0, p1, p2, p3);       
+    if (pll_custom_force==0)
+    {
+     rtc_clk_apll_enable(true, p0, p1, p2, p3);
+    }
+    else
+    {
+     custom_rtc_clk_apll_enable(true, p0, p1, p2, p3);
+    }
    }
   #endif
 
@@ -719,7 +830,7 @@ static void start_i2s_output()
 //   [7] V-sync
 //JJ void vga_init(const int *pin_map, const VgaMode &mode, bool double_buffered)
 //void vga_init(const unsigned char *pin_map, const VgaMode &mode, bool double_buffered)
-void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3)
+void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3,unsigned char pllcustomforce)
 {
   //vga_mode = &mode;
   #ifdef use_lib_log_serial
@@ -729,6 +840,7 @@ void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffere
 
   VgaMode_VgaMode(mode[0],mode[1],mode[2],mode[3],mode[4],mode[5],mode[6],mode[7],mode[8],mode[9],mode[10],mode[11]);
   pll_cte_force= pllcteforce; //force not calculate PLL
+  pll_custom_force= pllcustomforce; //fuerza uso de custom pll call function
   pll_cte_p0= p0;
   pll_cte_p1= p1;
   pll_cte_p2= p2;

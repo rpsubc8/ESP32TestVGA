@@ -86,7 +86,7 @@ const int VgaMode_vga_mode_640x400[12]={
 //JJ void vga_init(const int *vga_pins, const VgaMode &mode = vga_mode_320x240, bool double_buffered = true);
 //void vga_init(const unsigned char *vga_pins, const VgaMode &mode = vga_mode_320x240, bool double_buffered = true);
 
-void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3);
+void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3,unsigned char pllcustomforce);
 
 void vga_swap_buffers(bool wait_vsync = true);
 void vga_clear_screen(uint8_t color);
@@ -106,6 +106,7 @@ unsigned int vga_get_pll_cte_p3(void);
 
 void SetVideoInterrupt(unsigned char auxState);
 //void WaitVsync(void);
+void custom_rtc_clk_apll_enable(bool enable, uint32_t sdm0, uint32_t sdm1, uint32_t sdm2, uint32_t o_div);
 
 #endif
 

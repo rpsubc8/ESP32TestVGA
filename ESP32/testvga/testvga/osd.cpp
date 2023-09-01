@@ -124,7 +124,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 18
+#define max_gb_main_menu 20
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -143,6 +143,8 @@ const char * gb_main_menu[max_gb_main_menu]={
  "TTGOVGA32 NTSC CVBS 5V",
  "TTGOVGA32 NTSC CVBS 5V+",
  "ESP32 NTSC CVBS 3V",
+ "320x240x60hz bitluni PLL",
+ "320x200x70hz bitluni PLL",
  "Reset" 
 };
 
@@ -670,7 +672,7 @@ void InitModoCVBS(unsigned char opcion, unsigned char modoPALNTSC, double Vcc)
  vga_free();
  delay(100);
 
- vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+ vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0,0);
  SetVideoInterrupt(1);
  delay(100);
  SetVideoInterrupt(0);
@@ -759,6 +761,7 @@ void do_tinyOSD()
  {
   unsigned char auxSetVideo=0;
   unsigned char usepllcteforce=0;
+  unsigned char usecustompll=0;
   unsigned int p0=0;
   unsigned int p1=0;
   unsigned int p2=0;
@@ -785,6 +788,7 @@ void do_tinyOSD()
     auxSetVideo=1;
     gb_id_sel_video_mode= 1;
     break;
+
    case 2: 
     //Misma que bitluni,cambia el calculo PLL
     //320x240x60hz fabgl
@@ -799,6 +803,7 @@ void do_tinyOSD()
     p3= 0x0007;
     gb_id_sel_video_mode= 2;
     break;
+
    case 3:
     //QVGA 320x240x60hz fabgl
     gb_ptrVideo_cur= VgaMode_vga_mode_320x240;//QVGA 320x240x60hz fabgl
@@ -812,6 +817,7 @@ void do_tinyOSD()
     p3=0x0007;
     gb_id_sel_video_mode= 3;
     break;
+
    case 4:
     //320x200x70hz bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_320x200;
@@ -820,6 +826,7 @@ void do_tinyOSD()
     auxSetVideo=1; 
     gb_id_sel_video_mode= 4;
     break;
+
    case 5:
     //Mismo que bitluni pero PLL esta a calzador   
     //320x200x70hz fabgl
@@ -834,6 +841,7 @@ void do_tinyOSD()
     p3= 0x0005;
     gb_id_sel_video_mode= 5;
     break;
+
    case 6: 
     //360x400 bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_360x400;
@@ -842,6 +850,7 @@ void do_tinyOSD()
     auxSetVideo=1;
     gb_id_sel_video_mode= 6;   
     break;
+
    case 7: 
     //400x300 bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_400x300;
@@ -850,6 +859,7 @@ void do_tinyOSD()
     auxSetVideo=1;
     gb_id_sel_video_mode= 7;
     break;    
+
    case 8: 
     //320x350 bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_320x350;
@@ -857,7 +867,8 @@ void do_tinyOSD()
     gb_height= 350;
     auxSetVideo=1;
     gb_id_sel_video_mode= 8;
-    break;    
+    break;   
+
    case 9: 
     //320x400 bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_320x400;
@@ -866,6 +877,7 @@ void do_tinyOSD()
     auxSetVideo=1;
     gb_id_sel_video_mode= 9;
     break; 
+
    case 10: 
     //640x400 bitluni
     gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
@@ -874,6 +886,7 @@ void do_tinyOSD()
     auxSetVideo=1;
     gb_id_sel_video_mode= 10;
     break;
+
    case 11:
     //modo cvbs PAL TTGO VGA32 5V poco brillo
     gb_id_sel_video_mode= 11;
@@ -890,7 +903,8 @@ void do_tinyOSD()
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
      #endif         
     }
-    break;    
+    break;   
+
    case 12:
     //modo cvbs PAL TTGO VGA32 5V mas brillo    
     gb_id_sel_video_mode= 12;
@@ -908,6 +922,7 @@ void do_tinyOSD()
      #endif         
     }
     break; 
+
    case 13:
     //modo cvbs PAL ESP32 3V
     gb_id_sel_video_mode= 13;
@@ -924,7 +939,8 @@ void do_tinyOSD()
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
      #endif         
     }
-    break;     
+    break;  
+
    case 14:    
     //modo cvbs NTSC TTGO VGA32 5V poco brillo
     gb_id_sel_video_mode= 14;
@@ -941,7 +957,8 @@ void do_tinyOSD()
       Serial.printf("RAM free %d\r\n", ESP.getFreeHeap()); 
      #endif         
     }
-    break;     
+    break; 
+
    case 15:    
     //modo cvbs NTSC TTGO VGA32 5V+ mas brillo
     gb_id_sel_video_mode= 15;
@@ -959,6 +976,7 @@ void do_tinyOSD()
      #endif         
     }
     break;    
+
    case 16:    
     //modo cvbs NTSC ESP32 3V
     gb_id_sel_video_mode= 16;
@@ -978,6 +996,26 @@ void do_tinyOSD()
     break;        
 
    case 17:
+    //320x240x60hz bitluni call custom PLL function
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x240; 
+    gb_width= 320;
+    gb_height= 240;        
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 17;
+    usecustompll= 1;
+    break;   
+   
+   case 18:
+    //320x200x70hz bitluni call custom pll function
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x200;
+    gb_width= 320;
+    gb_height= 200;        
+    auxSetVideo=1; 
+    gb_id_sel_video_mode= 18;   
+    usecustompll= 1;
+    break;
+
+   case 19:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
@@ -1007,7 +1045,7 @@ void do_tinyOSD()
    
     ShutDownCVBS();
 
-    vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3);
+    vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3,usecustompll);
     SetVideoInterrupt(1);
 
     gb_sync_bits= vga_get_sync_bits();

@@ -28,6 +28,10 @@
  };
 #endif
 
+//TaskHandle_t gb_task_fix_pll;
+//volatile unsigned char gb_call_task_fix_pll_end=0;
+
+//void Task_fix_pll_code(void * parameter);
 
 const unsigned char * gb_sdl_font= gb_sdl_font_6x8;
 
@@ -103,7 +107,18 @@ void PrepareColorsBitluniVGA()
 #endif
 
 
-
+//void Task_fix_pll_code(void * parameter)
+//{    
+// //unsigned int ini,fin,aux;
+// gb_call_task_fix_pll_end= 0;
+// //ini= micros();
+// vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+// //fin=micros();
+// //aux= fin-ini;
+// //Serial.printf("Time vga_init %lu\r\n",aux);
+// //delay(3000);
+// gb_call_task_fix_pll_end= 1;
+//}
 
 
 
@@ -121,7 +136,16 @@ void setup()
  gb_cvbs_mode=0;
  gb_cvbs_shutdown=1;
 
- vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0);
+ //gb_call_task_fix_pll_end=0;
+ //xTaskCreatePinnedToCore(Task_fix_pll_code,"FixPLL",2048,NULL,0,&gb_task_fix_pll,0);
+ //unsigned int time_ini_fix_pll= millis();
+ //while ((gb_call_task_fix_pll_end==0)&&((millis()-time_ini_fix_pll)<2000)) { } 
+ //if ((millis()-time_ini_fix_pll)>=2000)
+ //{
+ // Serial.printf("Timeout\r\n");
+ //}
+ //vTaskDelete(gb_task_fix_pll);
+ vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0,0);
  gb_ptrVideo_cur= VgaMode_vga_mode_360x200;
  gb_width= 360;
  gb_height= 200;
