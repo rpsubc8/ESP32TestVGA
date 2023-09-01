@@ -20,6 +20,8 @@ Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENT
  <li>TTGOVGA32 NTSC CVBS 5V (NTSC CVBS GPIO 26)</li>
  <li>TTGOVGA32 NTSC CVBS 5V+ (NTSC CVBS GPIO 26)</li>
  <li>ESP32 NTSC CVBS 3V (NTSC CVBS GPIO 26)</li>
+ <li>320x240x60hz bitluni PLL</li>
+ <li>320x200x70hz bitluni PLL</li>
 </ul>
 
 
