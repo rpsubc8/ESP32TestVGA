@@ -101,8 +101,7 @@ From the Arduino IDE, this functionality is not allowed, since the serial monito
 The <b>gbConfig.h</b> file options are selected:
  <ul>
   <li><b>use_lib_log_serial:</b> Logs are sent by usb serial port</li> 
-  <li><b>use_lib_keyboard_poll_milis:</b> The number of polling milliseconds for the keyboard must be specified.</li>  
-  <li><b>FIX_PERIBOARD_NOT_INITING:</b> Solution made by <b>dcrespo3D</b> for initialization on some keyboards.</li>        
+  <li><b>use_lib_keyboard_poll_milis:</b> The number of polling milliseconds for the keyboard must be specified.</li>        
   <li><b>use_lib_fix_double_precision</b> It doesn't use the VGA video frequency calculation with the ESP32 itself, avoiding possible accuracy problems with the mantissa. This is useful for ESP32's that miscalculate the frequency.</li>
   <li><b>use_lib_debug_i2s</b> Plot with video mode calculations.</li>
   <li><b>use_lib_vga360x200x70hz_bitluni</b> 360x200 video mode with bitluni parameters.</li>
