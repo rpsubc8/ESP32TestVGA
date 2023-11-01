@@ -106,8 +106,7 @@ Desde el Arduino IDE, no se permite dicha funcionalidad, dado que el monitor ser
 El archivo <b>gbConfig.h</b> se seleccionan las opciones:
 <ul> 
  <li><b>use_lib_log_serial:</b> Se envian logs por puerto serie usb</li> 
- <li><b>use_lib_keyboard_poll_milis:</b> Se debe especificar el número de milisegundos de polling para el teclado.</li> 
- <li><b>FIX_PERIBOARD_NOT_INITING:</b> Solución realizada por <b>dcrespo3D</b> para la inicialización en algunos teclados.</li>
+ <li><b>use_lib_keyboard_poll_milis:</b> Se debe especificar el número de milisegundos de polling para el teclado.</li>
  <li><b>use_lib_fix_double_precision</b> No usa el cálculo de frecuencia de video VGA con el propio ESP32, evitando posibles problemas de precisión con la mantisa. Es útil para ESP32's que calculen mal la frecuencia.</li>
  <li><b>use_lib_debug_i2s</b> Traza con los cálculos del modo de video.</li>
  <li><b>use_lib_vga360x200x70hz_bitluni</b> Modo de video 360x200 con los parámetros de bitluni.</li>
