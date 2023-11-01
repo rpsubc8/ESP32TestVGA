@@ -8,7 +8,7 @@
  //#define use_lib_debug_i2s
 
  //Use terminal keyboard, putty
- #define use_lib_keyboard_uart
+ //#define use_lib_keyboard_uart
  
  //timeout read millis
  #define use_lib_keyboard_uart_timeout 0
@@ -16,8 +16,6 @@
  //log keyboard remote uart 
  //#define use_lib_log_keyboard_uart
 
- //Fixes error keyboards not initializing (solution dcrespo3D)
- #define FIX_PERIBOARD_NOT_INITING
  
  //Using modified bitluni library in C tiny fast
  #define use_lib_tinybitluni_fast 
@@ -70,7 +68,7 @@
  #define use_lib_vga8colors
  
  //Log output usb serial port
- #define use_lib_log_serial 
+ #define use_lib_log_serial
 
  
  //Usamos VGA y CVBS al mismo tiempo

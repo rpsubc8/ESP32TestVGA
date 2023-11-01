@@ -3,7 +3,7 @@
 
 #include "osd.h"
 #include "PS2Kbd.h"
-#include "keys.h"
+//#include "keys.h" //Ya no se necesita
 #include "hardware.h"
 //#include "gb_sdl_font8x8.h"
 //#include "gb_sdl_font6x8.h"

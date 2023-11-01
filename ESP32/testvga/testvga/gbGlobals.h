@@ -25,8 +25,13 @@
  extern volatile unsigned char gb_cvbs_mode;
  extern volatile unsigned char gb_cvbs_shutdown;
 
- extern volatile unsigned char keymap[256];
- extern volatile unsigned char oldKeymap[256];
+ //PS2Kbd BEGIN
+ //extern volatile unsigned char keymap[256];
+ //extern volatile unsigned char oldKeymap[256];
+ //extern volatile unsigned char gb_kb_bitcount;
+ //extern volatile unsigned char gb_kb_incoming;
+ //extern volatile unsigned int gb_kb_prev_ms; 
+ //PS2Kbd END
 
  extern unsigned char gb_current_ms_poll_sound; //milisegundos muestreo
  extern unsigned char gb_current_ms_poll_keyboard; //milisegundos muestreo teclado

@@ -1,14 +1,14 @@
 //author: ackerman
 //Test VGA Bitluni (Ricardo Massaro minimal library vga_6bit)
 //Project compatible Web Editor and ArduinoDroid (6.3.1)
+#include "gbConfig.h"
+#include "hardware.h"
+#include "gbGlobals.h"
 #include "PS2Kbd.h"
 #include <Arduino.h>
-#include "gbConfig.h"
-#include "testvga.h"
-#include "gbGlobals.h"
-#include "hardware.h"
+//#include "testvga.h" ////Ya no se necesita
 #include "osd.h"
-#include "PS2KeyCode.h"
+//#include "PS2KeyCode.h" //Ya no se necesita
 #include "vga_6bit.h"
 //#include "gb_sdl_font8x8.h"
 #include "gb_sdl_font6x8.h"
