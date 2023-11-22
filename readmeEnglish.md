@@ -22,6 +22,8 @@ Select the video mode with the up and down arrow keys and press ENTER to accept.
  <li>ESP32 NTSC CVBS 3V (NTSC CVBS GPIO 26)</li>
  <li>320x240x60hz bitluni PLL</li>
  <li>320x200x70hz bitluni PLL</li>
+ <li>384x264x56.2hz bitluni</li>
+ <li>360x240x56.3hz bitluni</li> 
 </ul>
  
 <br><br>
@@ -43,7 +45,7 @@ Required:
   <li>TTGO VGA32 v1.x (1.0, 1.1, 1.2, 1.4)</li>
   <li>Visual Studio 1.66.1 PLATFORMIO 2.5.0 Espressif32 v3.5.0</li>
   <li>Arduino IDE 1.8.11</li>  
-  <li>Arduino bitluni 0.3.3 reduced library (included in project)</li>
+  <li>Arduino bitluni 0.3.3 (Ricardo Massaro) reduced library (included in project)</li>
  </ul>
 <center><img src='https://raw.githubusercontent.com/rpsubc8/ESP32TestVGA/main/preview/ttgovga32v12.jpg'></center> 
 
