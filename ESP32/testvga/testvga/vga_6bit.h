@@ -79,6 +79,28 @@ const int VgaMode_vga_mode_640x400[12]={
 };
 
 
+//400x300 custom(384,264) 800x600 35.1KHz 56.2Hz
+//hf:12 hs:36 hb:60 hr:384 
+//vf:37 vSync:2 vb:58 vr:528
+//vd:2 pc:17280000
+//hSyncPolarity:0 vSyncPolarity:0
+const int VgaMode_vga_mode_400x300_384x264[12]={
+ 12,36,60,384 ,37,2,58,528 ,2,17280000,0,0
+};
+
+//400x300 custom(360,240) 800x600 35.2KHz 56.3Hz
+//hf:8 hs:32 hb:60 hr:360
+//vf:61 vSync:2 vb:82 vr:480
+//vd:2 pc:16200000
+//hSyncPolarity:0 vSyncPolarity:0
+const int VgaMode_vga_mode_400x300_360x240[12]={
+ 8,32,60,360 ,61,2,82,480 ,2,16200000,0,0
+};
+
+
+
+
+
 
 //extern const int VgaMode_vga_mode_200x150[12];
 

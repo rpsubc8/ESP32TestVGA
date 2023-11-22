@@ -124,7 +124,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 20
+#define max_gb_main_menu 22
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -145,6 +145,8 @@ const char * gb_main_menu[max_gb_main_menu]={
  "ESP32 NTSC CVBS 3V",
  "320x240x60hz bitluni PLL",
  "320x200x70hz bitluni PLL",
+ "384x264x56.2hz bitluni",
+ "360x240x56.3hz bitluni",
  "Reset" 
 };
 
@@ -1014,8 +1016,26 @@ void do_tinyOSD()
     gb_id_sel_video_mode= 18;   
     usecustompll= 1;
     break;
-
+   
    case 19:
+    //400x300 384x264 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300_384x264;
+    gb_width= 384;
+    gb_height= 264;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 19;
+    break;    
+
+   case 20:
+    //400x300 360x240 bitluni
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300_360x240;
+    gb_width= 360;
+    gb_height= 240;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 20;
+    break;
+
+   case 21:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
