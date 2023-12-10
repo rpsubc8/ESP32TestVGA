@@ -8,6 +8,10 @@
 //#include "gb_sdl_font8x8.h"
 //#include "gb_sdl_font6x8.h"
 #include "vga_6bit.h"
+#include "BitluniVGA.h"
+#include "testvga.h"
+
+
 
 
 //BEGIN Seccion CVBS
@@ -124,7 +128,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 22
+#define max_gb_main_menu 38
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -147,6 +151,22 @@ const char * gb_main_menu[max_gb_main_menu]={
  "320x200x70hz bitluni PLL",
  "384x264x56.2hz bitluni",
  "360x240x56.3hz bitluni",
+ "T40x25 320x200x70 bitluni", 
+ "T40x30 320x240x60 bitluni", 
+ "T50x37 400x300x56.2 bitlun",
+ "T80x50 640x400x70 bitluni",
+ "T80x25 640x400x70 bitluni",
+ "T40x25x3 320x200x70 bitlun", 
+ "T40x30x3 320x240x60 bitlun", 
+ "T50x37x3 400x300x56.2 bitl",
+ "T80x50x3 640x400x70 bitlun",
+ "T80x60x3 640x480x70 bitlun",
+ "T80x25x3 640x400x70 bitlun", //Retro
+ "320x200x1x70Hz bitluni",
+ "320x240x1x60Hz bitluni",
+ "400x300x1x56.2hz bitluni",
+ "640x400x1x70hz bitluni",
+ "800x600x1x54.2hz bitluni",
  "Reset" 
 };
 
@@ -177,7 +197,14 @@ void SDLClear()
   return;
  }
 
- //Modo VGA
+ //Modo BitluniVGA custom interrupt
+ if ((gb_vga_text==1)||(gb_vga_1bpp==1))
+ {
+  vga.clear();
+  return;
+ }
+
+ //Modo VGA Ricardo Massaro
  unsigned int a32= gb_const_colorNormal[0];
  unsigned int gb_topeY= 200;
  unsigned int gb_topeX_div4= 80;
@@ -194,6 +221,29 @@ void SDLClear()
 //{
 // gb_buffer_vga[y][x^2]= gb_const_colorNormal[c];
 //}
+
+//*************************************************************************************
+void SDLprintCharOSD1bpp(char car,int x,int y,unsigned char color,unsigned char backcolor)
+{
+
+ vga.dot_char1bpp(x,y,car,color,backcolor);
+
+/*
+ unsigned int auxId = car << 3;
+ unsigned char aux;
+ unsigned char auxColor;
+ for (unsigned char j=0;j<8;j++)
+ {
+  aux = gb_sdl_font[auxId + j];
+  for (unsigned int i=0;i<8;i++)
+  {
+   auxColor= ((aux>>i) & 0x01);    
+   vga.dot_jj((x+(6-i)),(y+j),((auxColor==1)?color:backcolor));   
+  }   
+ }
+*/
+
+}
 
 //*************************************************************************************
 void SDLprintCharOSD(char car,int x,int y,unsigned char color,unsigned char backcolor)
@@ -234,6 +284,30 @@ void SDLprintText(const char *cad,int x, int y, unsigned char color,unsigned cha
  unsigned int auxLen= strlen(cad);
  if (auxLen>50)
   auxLen=50;
+
+ //Modo texto Bitluni custom interrupt
+ if (gb_vga_text==1)
+ {
+  for (unsigned int i=0;i<auxLen;i++)
+  {
+   vga.dot_text((x>>3),(y>>3),cad[i],color,backcolor);
+   x+=8;
+  }   
+  return;
+ }
+
+ //Modo texto Bitluni custom interrupt
+ if (gb_vga_videomode == vgaMode_Bitmap1bpp)
+ {
+   for (unsigned int i=0;i<auxLen;i++)
+   {
+    SDLprintCharOSD1bpp(cad[i],x,y,((color>0)?1:0),((backcolor>0)?1:0));
+    x+=8; //x+=7;
+   }
+   return;
+ }
+
+ //Ricardo Massaro
  for (unsigned int i=0;i<auxLen;i++)
  {
   SDLprintCharOSD(cad[i],x,y,color,backcolor);
@@ -254,6 +328,8 @@ void SDLprintText(const char *cad,int x, int y, unsigned char color,unsigned cha
 #endif 
 #define gb_pos_y_menu 50
 #define gb_osd_max_rows 10
+
+
 
 void LineHorizontal(unsigned short int y,unsigned short int w,unsigned char c)
 {
@@ -304,13 +380,38 @@ void ShowInfoVideoMode()
 
  if (gb_dibuja==1)
  {
-  LineHorizontal(0,gb_width,0x07);
-  LineHorizontal((gb_height-1),gb_width,0x07);
+  if (gb_vga_text==1)
+  {
+  }
+  else
+  {
+   if (gb_vga_videomode==vgaMode_Bitmap1bpp)
+   {
+    vga.lineHorizontal_jj_1bpp(0,gb_width,1);  //LineHorizontal1bpp(0,gb_width,0x07);
+    vga.lineHorizontal_jj_1bpp((gb_height-1),gb_width,1);
 
-  LineVertical(0,(gb_height-1),0x07);
-  LineVertical((gb_width-1),(gb_height-1),0x07);
+    vga.lineVertical_jj_1bpp(0,(gb_height-1));  //LineVertical1bpp(0,(gb_height-1),0x07);
+    vga.lineVertical_jj_1bpp((gb_width-1),(gb_height-1)); //LineVertical1bpp((gb_width-1),(gb_height-1),0x07);
+    
+   }
+   else
+   {
+    LineHorizontal(0,gb_width,0x07);
+    LineHorizontal((gb_height-1),gb_width,0x07);
 
-  SDLprintText((char *)gb_main_menu[gb_id_sel_video_mode],(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK); 
+    LineVertical(0,(gb_height-1),0x07);
+    LineVertical((gb_width-1),(gb_height-1),0x07);
+   }
+  }
+
+  if (gb_vga_videomode==vgaMode_Bitmap1bpp)
+  {
+   SDLprintText((char *)gb_main_menu[gb_id_sel_video_mode],(col<<3),(row<<3),1,0);
+  }
+  else
+  {
+   SDLprintText((char *)gb_main_menu[gb_id_sel_video_mode],(col<<3),(row<<3),ID_COLOR_WHITE,ID_COLOR_BLACK);
+  }
  }
  
  if (gb_cvbs_mode==0)
@@ -397,7 +498,14 @@ void OSDMenuRowsDisplayScroll(const char **ptrValue,unsigned char currentId,unsi
    
   //SDLprintText(ptrValue[currentId],gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
   //SDLprintText(cadDest,gb_pos_x_menu,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
-  SDLprintText(cadDest,xOri,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));  
+  if (gb_vga_videomode == vgaMode_Bitmap1bpp)
+  {
+   SDLprintText(cadDest,xOri,gb_pos_y_menu+8+(i<<3),((i==0)?0:1),((i==0)?1:0));
+  }
+  else
+  {
+   SDLprintText(cadDest,xOri,gb_pos_y_menu+8+(i<<3),((i==0)?ID_COLOR_WHITE:ID_COLOR_WHITE),((i==0)?ID_COLOR_MAGENTA:ID_COLOR_BLACK));
+  }
 
   currentId++;
  }     
@@ -749,6 +857,46 @@ void SDLActivarOSDMainMenu()
  gb_show_osd_main_menu= true;   
 }
 
+
+//*******************************************
+void PruebaModoTexto(const unsigned int *pmode, unsigned char modeVideo)
+{
+ //gb_vga_text= 1;
+// gb_vga_1bpp= 0;
+
+ FreeInterrupt(); //Libero interrupcion Ricarso Massaro
+ //vga.FreeInterrupt(); //Libero interrupcion Bitluni
+ vga.FreeInterrupt(); 
+ vga.deleteDMABuffers(); 
+ vga.FreeGraphicsRAM();
+
+ //vga.MODEcurrent.SetValues(VgaMode_vga_mode_400x300); //Ahorrar memoria
+ vga.MODEcurrent.SetValues(pmode); //Ahorrar memoria
+ Serial.printf("Traza - PruebaModoTexto init\r\n"); 
+  
+ gb_vga_text= (modeVideo == vgaMode_Bitmap1bpp) ? 0 : 1;
+ gb_vga_1bpp= (modeVideo == vgaMode_Bitmap1bpp) ? 1 : 0;
+ gb_vga_videomode= modeVideo;
+ Serial.printf("Traza - gb_vga_videomode %d\r\n",gb_vga_videomode); 
+
+ vga.init(vga.MODEcurrent, pin_config);
+ Serial.printf("Traza - PruebaModoTexto clear\r\n");
+ vga.clear(); 
+ //delay(200);
+
+ //if (gb_vga_1bpp != 0)
+ //{
+ // vga.dot_text_cad(10,10," Esto es una prueba "); 
+ //}
+ //Serial.printf("Interrupt Esto es una prueba\r\n");
+ //SetVideoInterrupt(1);
+
+ Serial.printf(" RAM free %d\r\n", ESP.getFreeHeap());
+ //delay(1000);
+
+}
+
+
 //Very small tiny osd
 void do_tinyOSD() 
 {
@@ -761,6 +909,9 @@ void do_tinyOSD()
 
  if (gb_show_osd_main_menu == 1)
  {
+  unsigned char auxVgaBitluniVideoMode= vgaMode_novideo;
+  unsigned char auxUseTextMode=0;
+  unsigned char auxUse1bpp=0;
   unsigned char auxSetVideo=0;
   unsigned char usepllcteforce=0;
   unsigned char usecustompll=0;
@@ -1036,6 +1187,183 @@ void do_tinyOSD()
     break;
 
    case 21:
+    //40x25 Modo texto interrupcion 320x200x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextModeSimple;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x200;
+    gb_width= 320;
+    gb_height= 200;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 21;    
+    break;
+
+   case 22:
+    //40x30 Modo texto interrupcion 320x240x60hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextModeSimple;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x240;
+    gb_width= 320;
+    gb_height= 240;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 22;
+    break;  
+
+   case 23:
+    //50x37 Modo texto interrupcion 400x300 bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextModeSimple;
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300;
+    gb_width= 400;
+    gb_height= 300;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 23;
+    break;
+
+   case 24:
+    //80x50 Modo texto interrupcion 640x400x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextModeSimple;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 24;
+    break;
+
+   case 25:
+    //80x25 Modo texto interrupcion 640x400x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextModeSimpleRetro;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 25;
+    break;
+
+   case 26:
+    //40x25x3 8 colores Modo texto interrupcion 320x200x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x200;
+    gb_width= 320;
+    gb_height= 200;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 26;
+    break;
+
+   case 27:
+    //40x30 8 colores Modo texto interrupcion 320x240x60hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x240;
+    gb_width= 320;
+    gb_height= 240;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 27;
+    break;
+
+   case 28:
+    //50x37 8 colores Modo texto interrupcion 400x300 bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300;
+    gb_width= 400;
+    gb_height= 300;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 28;
+    break;    
+
+   case 29:
+    //80x50 8 colores Modo texto interrupcion 640x400x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 29;
+    break;
+
+   case 30:
+    //80x60 8 colores Modo texto interrupcion 640x480x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x480;
+    gb_width= 640;
+    gb_height= 480;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 30;
+    break;    
+
+   case 31:
+    //80x25 8 colores Modo texto interrupcion 640x400x70hz bitluni
+    auxUseTextMode= 1;
+    auxVgaBitluniVideoMode= vgaMode_TextMode3bppRetro;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 31;
+    break;
+
+   case 32:
+    //320x200x1x70Hz Bitmap 1 bpp bitluni custom interrupt
+    auxUseTextMode= 1; //realmente no es texto sino bitmap
+    auxVgaBitluniVideoMode= vgaMode_Bitmap1bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x200;
+    gb_width= 320;
+    gb_height= 200;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 32;
+    break;     
+
+   case 33:
+    //320x240x1x60Hz Bitmap 1 bpp bitluni custom interrupt
+    auxUseTextMode= 1; //realmente no es texto sino bitmap
+    auxVgaBitluniVideoMode= vgaMode_Bitmap1bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_320x240;
+    gb_width= 320;
+    gb_height= 240;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 33;
+    break; 
+
+   case 34:
+    //400x300x1x56.2hz Bitmap 1 bpp bitluni custom interrupt
+    auxUseTextMode= 1; //realmente no es texto sino bitmap
+    auxVgaBitluniVideoMode= vgaMode_Bitmap1bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_400x300;
+    gb_width= 400;
+    gb_height= 300;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 34;
+    break;            
+
+   case 35:
+    //640x400x1x70hz.2hz Bitmap 1 bpp bitluni custom interrupt
+    auxUseTextMode= 1; //realmente no es texto sino bitmap
+    auxVgaBitluniVideoMode= vgaMode_Bitmap1bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_640x400;
+    gb_width= 640;
+    gb_height= 400;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 35;
+    break;    
+
+   case 36:
+    //800x600   832x624 35.2Khz 54.2Hz
+    //800x600x1x54.2hz Bitmap 1 bpp bitluni custom interrupt
+    auxUseTextMode= 1; //realmente no es texto sino bitmap
+    auxVgaBitluniVideoMode= vgaMode_Bitmap1bpp;
+    gb_ptrVideo_cur= VgaMode_vga_mode_800x600;
+    gb_width= 800;
+    gb_height= 600;
+    auxSetVideo=1;
+    gb_id_sel_video_mode= 36;
+    break;    
+
+   case 37:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;
@@ -1046,9 +1374,9 @@ void do_tinyOSD()
   {   
    if (gb_id_sel_video_mode != gb_id_sel_video_mode_prev) 
    {
-    gb_id_sel_video_mode_prev = gb_id_sel_video_mode;
-    gb_dibuja= 1; //le toca redibujar
-      
+    gb_id_sel_video_mode_prev = gb_id_sel_video_mode;    
+    gb_dibuja= 1; //le toca redibujar      
+
     gb_cvbs_mode=0;
     gb_cvbs_shutdown=1;
     SetVideoInterrupt(0);
@@ -1065,13 +1393,40 @@ void do_tinyOSD()
    
     ShutDownCVBS();
 
-    vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3,usecustompll);
-    SetVideoInterrupt(1);
 
-    gb_sync_bits= vga_get_sync_bits();
-    gb_buffer_vga = vga_get_framebuffer();
-    gb_buffer_vga32=(unsigned int **)gb_buffer_vga;
-    PrepareColorsBitluniVGA(); //Llamar despues de tener gb_sync_bits 
+    if (auxUseTextMode==1)
+    {//Modo Bitluni TextMode interrupt     
+     PruebaModoTexto(gb_ptrVideo_cur,auxVgaBitluniVideoMode);
+    }
+    else
+    {     
+     //Modo Ricardo Massaro
+     Serial.printf("Traza - SetVideoInterrupt\r\n");
+     vga.SetVideoInterrupt(0); //disable interrupt vga bitluni
+     Serial.printf("Traza - FreeInterrupt\r\n");
+     vga.FreeInterrupt();
+     Serial.printf("Traza - deleteDMABuffers\r\n");
+     vga.deleteDMABuffers();
+     Serial.printf("Traza - FreeGraphicsRAM\r\n");
+     vga.FreeGraphicsRAM();
+
+     //gb_vga_text= (auxVgaBitluniVideoMode == vgaMode_Bitmap1bpp) ? 0 : 1;
+     //gb_vga_1bpp= (auxVgaBitluniVideoMode == vgaMode_Bitmap1bpp) ? 1 : 0;
+
+     Serial.printf("Traza - vga_init\r\n");
+     vga_init(pin_config,gb_ptrVideo_cur,false,usepllcteforce,p0,p1,p2,p3,usecustompll);
+     Serial.printf("Traza - SetVideoInterrupt\r\n");
+     SetVideoInterrupt(1);    
+
+     gb_sync_bits= vga_get_sync_bits();
+     gb_buffer_vga = vga_get_framebuffer();
+     gb_buffer_vga32=(unsigned int **)gb_buffer_vga;
+     PrepareColorsBitluniVGA(); //Llamar despues de tener gb_sync_bits 
+     
+     gb_vga_videomode= vgaMode_novideo;
+     gb_vga_text=0;
+     gb_vga_1bpp=0;
+    }
       
     SDLClear();
     #ifdef use_lib_log_serial  

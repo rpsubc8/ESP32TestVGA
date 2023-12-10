@@ -362,16 +362,31 @@ static volatile int DRAM_ATTR vga_frame_count = 0;    // incremented by I2S inte
 
 //static const VgaMode *vga_mode;
 
+void FreeInterrupt()
+{
+ if (i2s_isr_handle!=0)
+ {
+  esp_intr_free(i2s_isr_handle);
+  i2s_isr_handle=0; //Deberia chequear return ESP_OK
+ } 
+}
+
 //****************************
 void SetVideoInterrupt(unsigned char auxState)
 {
  if (auxState == 1)
  {
-  esp_intr_enable(i2s_isr_handle);
+  if (i2s_isr_handle!=0)
+  {
+   esp_intr_enable(i2s_isr_handle);   
+  }
  }
  else
  {
-  esp_intr_disable(i2s_isr_handle);
+  if (i2s_isr_handle!=0)
+  {
+   esp_intr_disable(i2s_isr_handle);   
+  }
  } 
 }
 
@@ -830,7 +845,7 @@ static void start_i2s_output()
 //   [7] V-sync
 //JJ void vga_init(const int *pin_map, const VgaMode &mode, bool double_buffered)
 //void vga_init(const unsigned char *pin_map, const VgaMode &mode, bool double_buffered)
-void vga_init(const unsigned char *pin_map, const int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3,unsigned char pllcustomforce)
+void vga_init(const unsigned char *pin_map, const unsigned int *mode, bool double_buffered,unsigned char pllcteforce, unsigned int p0,unsigned int p1,unsigned int p2,unsigned int p3,unsigned char pllcustomforce)
 {
   //vga_mode = &mode;
   #ifdef use_lib_log_serial
@@ -973,6 +988,9 @@ void vga_free()
 
  free(dma_buf_desc);
  dma_buf_desc= NULL;
+
+ FreeInterrupt(); //Liberamos interrupcion
+ Serial.printf("FreeInterrupt vga6bit\r\n");
 
  back_framebuffer = active_framebuffer = 0;  
 }

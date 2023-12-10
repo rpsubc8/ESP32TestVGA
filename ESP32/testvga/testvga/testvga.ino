@@ -12,6 +12,9 @@
 #include "vga_6bit.h"
 //#include "gb_sdl_font8x8.h"
 #include "gb_sdl_font6x8.h"
+#include "BitluniVGA.h" //Para modos interrupt
+#include "testvga.h"
+
 
 #ifdef use_lib_vga8colors
  //Uso solo RGB 3 bits DAC
@@ -26,6 +29,32 @@
   PIN_HSYNC,
   PIN_VSYNC      
  };
+
+
+ //const int hsyncPin=23;
+ //const int vsyncPin=15;
+ //const short int pin_config_bitluni[]= {
+ // RED_PIN_3B,
+ // GRE_PIN_3B,  
+ // BLU_PIN_3B,
+ // -1,
+ // -1,
+ // -1,
+ // PIN_HSYNC,
+ // PIN_VSYNC      
+ //}; 
+
+ unsigned char gb_vga_1bpp=0;
+ unsigned char gb_vga_text=0;
+ unsigned char gb_vga_videomode= vgaMode_novideo;
+ unsigned long precalcula_baseh_bit;
+ unsigned long precalcula_base_bit;
+ unsigned long precalcula_baseh_bitI;
+ unsigned long precalcula_base_bitI;
+ unsigned char precalcula_optimiceModehSync2;
+ unsigned short int precalcula_optimiceModehRes2;
+ unsigned short int precalcula_optimiceSumHfront;
+
 #endif
 
 //TaskHandle_t gb_task_fix_pll;
@@ -45,7 +74,7 @@ unsigned char gb_sync_bits;
 unsigned char **gb_buffer_vga;
 unsigned int **gb_buffer_vga32;
 
-const int *gb_ptrVideo_cur;
+const unsigned int *gb_ptrVideo_cur;
 
 unsigned short int gb_width;
 unsigned short int gb_height;
@@ -65,6 +94,8 @@ unsigned char gb_dibuja=1; //Solucion rapida.Hay que quitar
 volatile unsigned char gb_cvbs_mode=0;
 volatile unsigned char gb_cvbs_shutdown=1;
 
+
+VGA3BitI vga; //Modo interrupt
 
 
 
@@ -134,7 +165,7 @@ void setup()
  #endif
 
  gb_cvbs_mode=0;
- gb_cvbs_shutdown=1;
+ gb_cvbs_shutdown=1; 
 
  //gb_call_task_fix_pll_end=0;
  //xTaskCreatePinnedToCore(Task_fix_pll_code,"FixPLL",2048,NULL,0,&gb_task_fix_pll,0);
@@ -145,6 +176,17 @@ void setup()
  // Serial.printf("Timeout\r\n");
  //}
  //vTaskDelete(gb_task_fix_pll);
+
+ //PruebaModoTexto(); 
+ //vga.MODEcurrent.SetValues(VgaMode_vga_mode_400x300); //Ahorrar memoria
+ //vga.init(vga.MODEcurrent, pin_config);
+ //delay(100);
+
+ gb_colorBW[0]= 0x00;
+ gb_colorBW[1]= 0x07;
+ memcpy(gb_sdl_font_6x8_ram,gb_sdl_font_6x8,sizeof(gb_sdl_font_6x8_ram)); 
+ 
+
  vga_init(pin_config,VgaMode_vga_mode_360x200,false,0,0,0,0,0,0);
  gb_ptrVideo_cur= VgaMode_vga_mode_360x200;
  gb_width= 360;

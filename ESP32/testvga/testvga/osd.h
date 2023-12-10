@@ -26,5 +26,7 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
 void SDLprintText(const char *cad,int x, int y, unsigned char color,unsigned char backcolor);
 void InitModoCVBS(unsigned char opcion, unsigned char modoPALNTSC,double Vcc);
 
+void PruebaModoTexto(void);
+
 #endif
 

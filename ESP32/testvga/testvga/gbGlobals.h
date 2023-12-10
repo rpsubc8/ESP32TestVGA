@@ -2,6 +2,20 @@
  #define _GB_GLOBALS_H
  #include "gbConfig.h"
 
+ extern unsigned char gb_vga_1bpp;
+ extern unsigned char gb_vga_text;
+ extern unsigned char gb_vga_videomode;
+ extern const short int pin_config_bitluni[];
+ extern unsigned char gb_colorBW[2]; 
+ extern unsigned char gb_sdl_font_6x8_ram[2048]; //256*8
+ extern unsigned long precalcula_baseh_bit;
+ extern unsigned long precalcula_base_bit;
+ extern unsigned long precalcula_baseh_bitI;
+ extern unsigned long precalcula_base_bitI;
+ extern unsigned char precalcula_optimiceModehSync2;
+ extern unsigned short int precalcula_optimiceModehRes2;
+ extern unsigned short int precalcula_optimiceSumHfront;
+
 
  #ifdef use_lib_keyboard_uart
   #define BUFFER_SIZE_UART 50
@@ -49,7 +63,7 @@
 
  extern const unsigned char * gb_sdl_font;
 
- extern const int *gb_ptrVideo_cur;
+ extern const unsigned int *gb_ptrVideo_cur;
 
  extern unsigned short int gb_width;
  extern unsigned short int gb_height; 
