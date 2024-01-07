@@ -219,8 +219,16 @@ Para procesar las imágenes, debemos de convertirlas a escala de gris (256 degra
 Debemos asegurarnos que nos quedan 8 colores, aunque estemos usando formatos de imágenes con 16.
 <center><img src='preview/ventanaPaletaGris.gif'></center>
 Y por último se aplica una conversión a RAW.<br>
-A la hora de visualizar, se debe aplicar el orden mencionado.<br>
+A la hora de visualizar, se debe aplicar el orden mencionado.<br><br>
 Aquí tenemos el Phantis con 8 colores:
 <center><img src='preview/rawPhantis8colores.gif'></center>
 Y aquí en monocromo:
 <center><img src='preview/rawPhantisGris.gif'></center>
+Aquí está el GameOver con 8 colores:
+<center><img src='preview/rawGameOver8colores.gif'></center>
+Y aquí en monocromo:
+<center><img src='preview/rawGameOverGris.gif'></center>
+El mandril de test EGA y VGA con 8 colores:
+<center><img src='preview/rawMandril8colores.gif'></center>
+Y aquí en monocromo:
+<center><img src='preview/rawMandrilGris.gif'></center>
