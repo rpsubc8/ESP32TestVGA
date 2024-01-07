@@ -219,4 +219,8 @@ Para procesar las imágenes, debemos de convertirlas a escala de gris (256 degra
 Debemos asegurarnos que nos quedan 8 colores, aunque estemos usando formatos de imágenes con 16.
 <center><img src='preview/ventanaPaletaGris.gif'></center>
 Y por último se aplica una conversión a RAW.<br>
-A la hora de visualizar, se debe aplicar el orden mencionado.
+A la hora de visualizar, se debe aplicar el orden mencionado.<br>
+Aquí tenemos el Phantis con 8 colores:
+<center><img src='preview/rawPhantis8colores.gif'></center>
+Y aquí en monocromo:
+<center><img src='preview/rawPhantisGris.gif'></center>
