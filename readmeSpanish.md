@@ -195,3 +195,28 @@ Si tenemos una capturadora VGA, podemos aplicar el filtro desde el propio Window
 <center><img src='preview/saturacionColor.jpg'></center>
 Si ponemos el digital vibrance de 50 a valor 0, nos queda en blanco y negro.
 <center><img src='preview/saturacionMonocromo.jpg'></center>
+<br>
+Aquí está la paleta del DAC 3 bits de 8 colores con su valor decimal y el binario (RGB):
+<center><img src='preview/8coloresBinario.gif'></center>
+Aquí está como se vería desde un monitor monocromo:
+<center><img src='preview/8coloresGris.gif'></center>
+Como se puede ver, el orden lógico no se corresponde con el real de luz. Para eso, si aplicamos un orden por luminancia:
+<center><img src='preview/8coloresGrisOrden.gif'></center>
+Este orden, es lo que se aplica a la imagen internamente, para que así se puede ver realmente los 8 degradados de gris, de forma que el orden es:
+<ul>
+ <li>0 - 0</li>
+ <li>1 - 4</li>
+ <li>2 - 1</li>
+ <li>3 - 5</li>
+ <li>4 - 2</li>
+ <li>5 - 6</li>
+ <li>6 - 3</li>
+ <li>7 - 7</li>
+</ul>
+<br>
+Para procesar las imagenes, debemos de convertirlas a escala de gri (256 degradados) desde Gimp o desde Paint Sho Pro, para después aplicar la reducción de 8 colores en degradado de gris:
+<center><img src='preview/ventanaReducirGris'></center>
+Debemos asegurarnos que nos quedan 8 colores, aunque estenemos usando formatos de imagenes con 16.
+<center><img src='preview/ventanaPaletaGris.gif'></center>
+Y por último se aplica una conversión a RAW.<br>
+A la hora de visualizar, se debe aplicar el orden mencionado.
