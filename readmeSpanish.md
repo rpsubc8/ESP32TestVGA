@@ -214,9 +214,9 @@ Este orden, es lo que se aplica a la imagen internamente, para que así se puede
  <li>7 - 7</li>
 </ul>
 <br>
-Para procesar las imagenes, debemos de convertirlas a escala de gri (256 degradados) desde Gimp o desde Paint Sho Pro, para después aplicar la reducción de 8 colores en degradado de gris:
-<center><img src='preview/ventanaReducirGris'></center>
-Debemos asegurarnos que nos quedan 8 colores, aunque estenemos usando formatos de imagenes con 16.
+Para procesar las imagenes, debemos de convertirlas a escala de gri (256 degradados) desde Gimp o desde Paint Shop Pro, para después aplicar la reducción de 8 colores en degradado de gris:
+<center><img src='preview/ventanaReducirGris.gif'></center>
+Debemos asegurarnos que nos quedan 8 colores, aunque estenemos usando formatos de imágenes con 16.
 <center><img src='preview/ventanaPaletaGris.gif'></center>
 Y por último se aplica una conversión a RAW.<br>
 A la hora de visualizar, se debe aplicar el orden mencionado.
