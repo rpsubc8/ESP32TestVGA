@@ -198,7 +198,7 @@ Si ponemos el digital vibrance de 50 a valor 0, nos queda en blanco y negro.
 <br>
 Aquí está la paleta del DAC 3 bits de 8 colores con su valor decimal y el binario (RGB):
 <center><img src='preview/8coloresBinario.gif'></center>
-Aquí está como se vería desde un monitor monocromo:
+Aquí está, como se vería desde un monitor monocromo:
 <center><img src='preview/8coloresGris.gif'></center>
 Como se puede ver, el orden lógico no se corresponde con el real de luz. Para eso, si aplicamos un orden por luminancia:
 <center><img src='preview/8coloresGrisOrden.gif'></center>
@@ -214,9 +214,9 @@ Este orden, es lo que se aplica a la imagen internamente, para que así se puede
  <li>7 - 7</li>
 </ul>
 <br>
-Para procesar las imagenes, debemos de convertirlas a escala de gri (256 degradados) desde Gimp o desde Paint Shop Pro, para después aplicar la reducción de 8 colores en degradado de gris:
+Para procesar las imágenes, debemos de convertirlas a escala de gris (256 degradados) desde Gimp o desde Paint Shop Pro, para después aplicar la reducción de 8 colores en degradado de gris:
 <center><img src='preview/ventanaReducirGris.gif'></center>
-Debemos asegurarnos que nos quedan 8 colores, aunque estenemos usando formatos de imágenes con 16.
+Debemos asegurarnos que nos quedan 8 colores, aunque estemos usando formatos de imágenes con 16.
 <center><img src='preview/ventanaPaletaGris.gif'></center>
 Y por último se aplica una conversión a RAW.<br>
 A la hora de visualizar, se debe aplicar el orden mencionado.
