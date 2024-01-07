@@ -192,3 +192,6 @@ Y aquí activando el filtro de escala de grises con 8 degradados:
 El filtro se puede conseguir fácilmente, con un monitor VGA monocromo.<br>
 En los monitores modernos, si disponen de filtros en el OSD, también es muy sencillo. Si no, se puede variar los valores de cada componente RGB desde el OSD para lograr la saturación.<br>
 Si tenemos una capturadora VGA, podemos aplicar el filtro desde el propio Windows, activando la saturación.<br>
+<center><img src='preview/saturacionColor.jpg'></center>
+Si ponemos el digital vibrance de 50 a valor 0, nos queda en blanco y negro.
+<center><img src='preview/saturacionMonocromo'></center>
