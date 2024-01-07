@@ -178,3 +178,17 @@ void loop() {
 </pre>
 Los valores máximos al escribir en el buffer de video en una placa ESP32 es de 54, mientras que para TTGO VGA32 v1.x sería de 35.
 
+
+
+<br><br>
+<h1>Monocromo (8 colores)</h1>
+En la época clásica se usaban monitores en blanco y negro, de manera que se sacaba más partido frente al color. Aplicando un filtro básico de escala de grises se puede conseguir el mismo efecto, con tan sólo 8 colores y el DAC básico de 3 bits.<br>
+He creado una tool para convertir la paleta de 8 colores en el modo DAC 3 bits (RGB) a un degradado monocromo.
+Aquí se puede ver una maqueta de coche del Ferrari 250 GTO con los 8 colores:
+<center><img src='preview/raw250gto8colores'></center>
+Y aquí activando el filtro de escala de grises con 8 degradados:
+<center><img src='preview/raw250gtoGris'></center>
+
+El filtro se puede conseguir fácilmente, con un monitor VGA monocromo.<br>
+En los monitores modernos, si disponen de filtros en el OSD, también es muy sencillo. Si no, se puede variar los valores de cada componente RGB desde el OSD para lograr la saturación.<br>
+Si tenemos una capturadora VGA, podemos aplicar el filtro desde el propio Windows, activando la saturación.<br>
