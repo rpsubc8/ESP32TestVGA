@@ -40,6 +40,10 @@ Seleccione el modo de vídeo con las teclas de flecha arriba y abajo y pulse ENT
  <li>400x300x1x56.2hz bitluni</li>
  <li>640x400x1x70hz bitluni</li>
  <li>800x600x1x54.2hz bitluni</li>
+ <li>PIC 250 GTO</li>
+ <li>PIC Phantis</li>
+ <li>PIC Game Over</li>
+ <li>PIC Mandril</li>
 </ul>
 
 
@@ -190,7 +194,7 @@ Y aquí activando el filtro de escala de grises con 8 degradados:
 <center><img src='preview/raw250gtoGris.gif'></center>
 
 El filtro se puede conseguir fácilmente, con un monitor VGA monocromo.<br>
-En los monitores modernos, si disponen de filtros en el OSD, también es muy sencillo. Si no, se puede variar los valores de cada componente RGB desde el OSD para lograr la saturación.<br>
+En los monitores y TV modernos, si disponen de filtros en el OSD, también es muy sencillo. Si no, se puede variar los valores de cada componente RGB desde el OSD para lograr la saturación.<br>
 Si tenemos una capturadora VGA, podemos aplicar el filtro desde el propio Windows, activando la saturación.<br>
 <center><img src='preview/saturacionColor.jpg'></center>
 Si ponemos el digital vibrance de 50 a valor 0, nos queda en blanco y negro.
