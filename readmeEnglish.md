@@ -39,7 +39,11 @@ Select the video mode with the up and down arrow keys and press ENTER to accept.
  <li>320x240x1x60Hz bitluni</li>
  <li>400x300x1x56.2hz bitluni</li>
  <li>640x400x1x70hz bitluni</li>
- <li>800x600x1x54.2hz bitluni</li> 
+ <li>800x600x1x54.2hz bitluni</li>
+ <li>PIC 250 GTO</li>
+ <li>PIC Phantis</li>
+ <li>PIC Game Over</li>
+ <li>PIC Mandril</li> 
 </ul>
  
 <br><br>
@@ -174,3 +178,54 @@ void loop() {
 The maximum values when writing to the video buffer on an ESP32 board is 54, while for TTGO VGA32 v1.x it would be 35.
 
  
+<br><br>
+<h1>Monochrome (8 colours)</h1>
+In the classical era, black and white monitors were used, so that more benefit was gained from colour. By applying a basic greyscale filter the same effect can be achieved, with only 8 colours and the basic 3-bit DAC.<br>
+I have created a tool to convert the 8-colour palette in 3-bit DAC mode (RGB) to a monochrome gradient.
+Here you can see a model car of the Ferrari 250 GTO with the 8 colours:
+<center><img src='preview/raw250gto8colores.gif'></center>
+And here activating the greyscale filter with 8 gradients:
+<center><img src='preview/raw250gtoGris.gif'></center>
+The filter can be easily achieved with a monochrome VGA monitor.<br>
+On modern monitors and TVs, if they have filters in the OSD, this is also very simple. If not, you can vary the values of each RGB component from the OSD to achieve saturation.<br>
+If you have a VGA capture machine, you can apply the filter from within Windows by activating the saturation.<br>
+<center><img src='preview/saturacionColor.jpg'></center>
+If we set the digital vibrance of 50 to a value of 0, we are left with black and white.
+<center><img src='preview/saturacionMonocromo.jpg'></center>
+<br>
+Here is the DAC 3-bit 8-colour palette with its decimal and binary (RGB) value:
+<center><img src='preview/8coloresBinario.gif'></center>
+Here it is, as seen from a monochrome monitor:
+<center><img src='preview/8coloresGris.gif'></center>
+As can be seen, the logical order does not correspond to the actual order of light. For that, if we apply an order by luminance:
+<center><img src='preview/8coloresGrisOrden.gif'></center>
+This order, is what is applied to the image internally, so that you can actually see the 8 grey gradients, so the order is:
+<ul>
+ <li>0 - 0</li>
+ <li>1 - 4</li>
+ <li>2 - 1</li>
+ <li>3 - 5</li>
+ <li>4 - 2</li>
+ <li>5 - 6</li>
+ <li>6 - 3</li>
+ <li>7 - 7</li>
+</ul>
+<br>
+To process the images, we have to convert them to greyscale (256 gradients) from Gimp or Paint Shop Pro, and then apply the 8-colour grey gradient reduction:
+<center><img src='preview/ventanaReducirGris.gif'></center>
+We must make sure that we have 8 colours left, even if we are using image formats with 16.
+<center><img src='preview/ventanaPaletaGris.gif'></center>
+And finally a conversion to RAW is applied.<br>
+When viewing, the above order should be applied.<br><br>
+Here we have the Phantis with 8 colours:
+<center><img src='preview/rawPhantis8colores.gif'></center>
+And here in monochrome:
+<center><img src='preview/rawPhantisGris.gif'></center>
+Here is the GameOver with 8 colours:
+<center><img src='preview/rawGameOver8colores.gif'></center>
+And here in monochrome:
+<center><img src='preview/rawGameOverGris.gif'></center>
+EGA and VGA test chuck with 8 colours:
+<center><img src='preview/rawMandril8colores.gif'></center>
+And here in monochrome:
+<center><img src='preview/rawMandrilGris.gif'></center>
