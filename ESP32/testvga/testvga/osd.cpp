@@ -10,6 +10,11 @@
 #include "vga_6bit.h"
 #include "BitluniVGA.h"
 #include "testvga.h"
+//#include "mandrilGris.h" //400x400
+#include "250gtoTruco8.h"
+#include "phantisTruco8.h"
+#include "gameoverTruco8.h"
+#include "mandrilTruco8.h"
 
 
 
@@ -128,7 +133,7 @@ const char * gb_osd_screen_values[max_gb_osd_screen_values]={
 
 
 
-#define max_gb_main_menu 38
+#define max_gb_main_menu 42
 const char * gb_main_menu[max_gb_main_menu]={
  "360x200x70hz bitluni", 
  "320x240x60hz bitluni",
@@ -167,6 +172,10 @@ const char * gb_main_menu[max_gb_main_menu]={
  "400x300x1x56.2hz bitluni",
  "640x400x1x70hz bitluni",
  "800x600x1x54.2hz bitluni",
+ "PIC 250 GTO",
+ "PIC Phantis",
+ "PIC Game Over",
+ "PIC Mandril",
  "Reset" 
 };
 
@@ -208,6 +217,20 @@ void SDLClear()
  unsigned int a32= gb_const_colorNormal[0];
  unsigned int gb_topeY= 200;
  unsigned int gb_topeX_div4= 80;
+ a32= a32|(a32<<8)|(a32<<16)|(a32<<24);
+ for (int y=0; y<gb_topeY; y++){
+  for (int x=0; x<gb_topeX_div4; x++){
+   gb_buffer_vga32[y][x]= a32;
+  }
+ }
+}
+
+//***********************************************************
+void SDLVGAFullClear()
+{
+ unsigned int a32= gb_const_colorNormal[0];
+ unsigned int gb_topeY= gb_height;
+ unsigned int gb_topeX_div4= (gb_width>>2);
  a32= a32|(a32<<8)|(a32<<16)|(a32<<24);
  for (int y=0; y<gb_topeY; y++){
   for (int x=0; x<gb_topeX_div4; x++){
@@ -662,6 +685,9 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
  {
   ShowInfoVideoMode();
  }
+
+ //PutMandrilGris();
+ //PutImagenTruco8(imagen_250gto_ancho,imagen_250gto_alto,imagen_250gto_truco8);
  
  while (salir == 0)
  {             
@@ -752,6 +778,94 @@ unsigned char ShowTinyMenu(const char *cadTitle,const char **ptrValue,unsigned c
  return aReturn;
 }
 
+//********************************************
+void WaitKeypress()
+{
+ unsigned char salir=0;    
+ #ifdef use_lib_keyboard_uart
+  unsigned int curTime_keyboard_uart;
+  unsigned int curTime_keyboard_before_uart;  
+ #endif 
+ unsigned int curTime_keyboard;
+ unsigned int curTime_keyboard_before;
+ 
+ #ifdef use_lib_keyboard_uart
+  curTime_keyboard_uart = curTime_keyboard_before_uart= millis();
+ #endif
+ 
+ curTime_keyboard= curTime_keyboard_before= millis();
+ while (salir == 0)
+ {             
+  //case SDLK_UP:
+  curTime_keyboard = millis();    
+  if ((curTime_keyboard - curTime_keyboard_before) >= gb_current_ms_poll_keyboard)
+  {   
+   curTime_keyboard_before= curTime_keyboard;
+
+   #ifdef use_lib_keyboard_uart
+    curTime_keyboard_uart= curTime_keyboard;
+    if ((curTime_keyboard_uart - curTime_keyboard_before_uart) >= gb_current_ms_poll_keyboard_uart)
+    {
+     curTime_keyboard_before_uart = curTime_keyboard_uart;
+     keyboard_uart_poll();
+    
+     if (checkKey_uart(KEY_CURSOR_LEFT)==1)
+     {
+      salir= 1;            
+     }
+     if (checkKey_uart(KEY_CURSOR_RIGHT)==1)
+     {
+      salir= 1;       
+     }  
+     if (checkKey_uart(KEY_CURSOR_UP)==1)
+     {
+      salir= 1;
+     }
+     if (checkKey_uart(KEY_CURSOR_DOWN)==1)
+     {
+      salir= 1;             
+     }
+     if (checkKey_uart(KEY_ENTER)==1)
+     {
+      salir= 1;
+     }
+     if (checkKey_uart(KEY_ESC))
+     {
+      salir=1;
+     }
+    }
+   #endif
+
+   if (checkAndCleanKey(KEY_CURSOR_LEFT))
+   {
+    salir= 1;
+   }
+   if (checkAndCleanKey(KEY_CURSOR_RIGHT))
+   {
+    salir= 1;
+   }  
+   if (checkAndCleanKey(KEY_CURSOR_UP))
+   {
+    salir= 1;
+   }
+   if (checkAndCleanKey(KEY_CURSOR_DOWN))
+   {
+    salir= 1;
+   }
+   if (checkAndCleanKey(KEY_ENTER))
+   {
+    salir= 1;
+   }
+   //case SDLK_KP_ENTER: case SDLK_RETURN: salir= 1;break;
+   if (checkAndCleanKey(KEY_ESC))
+   {
+    salir= 1;
+   }
+   //case SDLK_ESCAPE: salir=1; aReturn= 255; break;
+   //default: break;
+  }
+ }
+}
 
 
 //Menu resetear
@@ -897,6 +1011,87 @@ void PruebaModoTexto(const unsigned int *pmode, unsigned char modeVideo)
 }
 
 
+/*
+void PutMandrilGris()
+{
+ const unsigned char orden[8]={0,4, 1,5, 2,6, 3,7};
+ unsigned int auxOffs=0;
+ unsigned char id;
+
+ for (int y=0;y<400;y++)
+ {
+  auxOffs= (y*400);
+  for (int x=0;x<400;x++)
+  {   
+   //vga.dot(x,y,gb_color[imagen_mandril_gris[auxOffs]]);   
+   //PonPixelMandril(x,y,imagen_mandril_gris[auxOffs]);
+   if ((x<320)&&(y<200))
+   {
+    id= (imagen_mandril_gris[auxOffs]&0x07);
+    gb_buffer_vga[y][x^2]= gb_const_colorNormal[orden[id]];
+   }
+
+   auxOffs++;
+  }
+ }
+}
+*/
+
+
+void PutImagenTruco8(unsigned short int ancho, unsigned short int alto, const unsigned char *pData)
+{
+ const unsigned char orden[8]={0,4, 1,5, 2,6, 3,7};     
+ unsigned char id,a0,a1;
+ unsigned int auxOffs=0; 
+ unsigned short int auxx;
+ 
+ //gb_image_ptr= pData;
+ //gb_imagen_ancho= ancho;
+ //gb_imagen_alto= alto;
+ 
+ for(int y=0;y<alto;y++)
+ {
+  auxOffs= y*(ancho>>1);
+  auxx=0;
+  for(int x=0;x<(ancho>>1);x++)
+  {    
+   id= pData[auxOffs];
+   a1= (id>>4)&0x07;
+   a0= id&0x07;
+   
+   //vga.dot(auxx,y,gb_color[orden[a1]]);
+   //auxx++;
+   //vga.dot(auxx,y,gb_color[orden[a0]]);
+   //auxx++;
+
+   if (y>=gb_height)
+   {
+    break;
+   }
+
+   id= pData[auxOffs];
+   a1= (id>>4)&0x07;
+   a0= id&0x07;
+   if (auxx>=gb_width)
+   {
+    break;
+   }
+   gb_buffer_vga[y][auxx^2]= gb_const_colorNormal[orden[a1]];    
+   auxx++;
+   if (auxx>=gb_width)    
+   {
+    break;
+   }
+   gb_buffer_vga[y][auxx^2]= gb_const_colorNormal[orden[a0]];    
+   auxx++;    
+   
+
+   auxOffs++;
+  }
+ }
+}
+
+
 //Very small tiny osd
 void do_tinyOSD() 
 {
@@ -920,7 +1115,7 @@ void do_tinyOSD()
   unsigned int p2=0;
   unsigned int p3=0;  
 
-  aSelNum = ShowTinyMenu("Select Video Mode         ",gb_main_menu,max_gb_main_menu,gb_id_sel_video_mode);      
+  aSelNum = ShowTinyMenu("Select Video Mode         ",gb_main_menu,max_gb_main_menu,gb_id_sel_video_mode);        
   gb_dibuja= 0;
   switch (aSelNum)
   {
@@ -1364,6 +1559,66 @@ void do_tinyOSD()
     break;    
 
    case 37:
+    if(
+       ((gb_id_sel_video_mode>=0)&&(gb_id_sel_video_mode<=10))
+       ||
+       ((gb_id_sel_video_mode>=17)&&(gb_id_sel_video_mode<=20))
+      ) 
+    {
+     SDLVGAFullClear();
+     PutImagenTruco8(imagen_250gto_ancho,imagen_250gto_alto,imagen_250gto_truco8);
+     WaitKeypress();
+     SDLVGAFullClear();
+    }
+    gb_dibuja=1;
+    break;
+
+   case 38:
+    if(
+       ((gb_id_sel_video_mode>=0)&&(gb_id_sel_video_mode<=10))
+       ||
+       ((gb_id_sel_video_mode>=17)&&(gb_id_sel_video_mode<=20))
+      ) 
+    {
+     SDLVGAFullClear();
+     PutImagenTruco8(imagen_phantis_ancho,imagen_phantis_alto,imagen_phantis_truco8);
+     WaitKeypress();
+     SDLVGAFullClear();
+    }
+    gb_dibuja=1;
+    break;
+
+   case 39:
+    if(
+       ((gb_id_sel_video_mode>=0)&&(gb_id_sel_video_mode<=10))
+       ||
+       ((gb_id_sel_video_mode>=17)&&(gb_id_sel_video_mode<=20))
+      ) 
+    {
+     SDLVGAFullClear();
+     PutImagenTruco8(imagen_gameover_ancho,imagen_gameover_alto,imagen_gameover_truco8);
+     WaitKeypress();
+     SDLVGAFullClear();
+    }
+    gb_dibuja=1;
+    break;
+
+   case 40:
+    if(
+       ((gb_id_sel_video_mode>=0)&&(gb_id_sel_video_mode<=10))
+       ||
+       ((gb_id_sel_video_mode>=17)&&(gb_id_sel_video_mode<=20))
+      ) 
+    {
+     SDLVGAFullClear();
+     PutImagenTruco8(imagen_mandril_ancho,imagen_mandril_alto,imagen_mandril_truco8);
+     WaitKeypress();
+     SDLVGAFullClear();
+    }
+    gb_dibuja=1;
+    break;        
+
+   case 41:
     //ShowTinyResetMenu(); 
     ESP.restart();
     break;

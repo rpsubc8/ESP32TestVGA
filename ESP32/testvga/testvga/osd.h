@@ -28,5 +28,11 @@ void InitModoCVBS(unsigned char opcion, unsigned char modoPALNTSC,double Vcc);
 
 void PruebaModoTexto(void);
 
+//void PutMandrilGris(void);
+//void PonPixelMandril(unsigned short int x,unsigned short int y,unsigned char color);
+void PutImagenTruco8(unsigned short int ancho, unsigned short int alto, const unsigned char *pData);
+void SDLVGAFullClear(void);
+void WaitKeypress(void);
+
 #endif
 

@@ -105,6 +105,9 @@ VGA3BitI vga; //Modo interrupt
  void do_keyboard_uart(void);
 #endif 
 
+
+
+
 //*******************************
 void PrepareColorsBitluniVGA()
 {  
