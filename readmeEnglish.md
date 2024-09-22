@@ -103,6 +103,12 @@ The project is now ready, so no bitluni or fabgl libraries are needed.
 We must deactivate the PSRAM option, and in case of exceeding 1 MB of binary, select 4 MB of partition when uploading. Although the code does not use PSRAM, if the option is active and our ESP32 does not have it, an exception will be generated and it will restart in loop mode.
 
 
+<br><br>
+<h1>Test keyboard PS/2</h1>
+To test a PS/2 keyboard:
+<a href='https://github.com/rpsubc8/testkeyboardPS2'>https://github.com/rpsubc8/testkeyboardPS2</a>
+
+
 
 <br><br>
 <h1>UART keyboard</h1>
