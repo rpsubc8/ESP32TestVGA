@@ -11,7 +11,10 @@
 
 //static unsigned char keymap[256];
 //static unsigned char oldKeymap[256];
-static unsigned char keymap[32]; //256 DIV 8 = 32 bytes packet bit
+#define gb_max_keymap 32
+#define gb_max_keymap32 8
+volatile unsigned char gb_keymap[gb_max_keymap]; //256 DIV 8 = 32 bytes packet bit
+volatile unsigned int *gb_keymap32=(unsigned int *)gb_keymap;
 
 //unsigned int shift = 0; //Ya no se necesita
 //byte lastcode = 0; //Ya no se necesita
@@ -42,12 +45,14 @@ void IRAM_ATTR kb_interruptHandler()
 
  //int clock = digitalRead(KEYBOARD_CLK);
  //if (clock == 1)
- if (digitalRead(KEYBOARD_CLK) == 1)
+ //if (digitalRead(KEYBOARD_CLK) == 1)
+ if ((REG_READ(GPIO_IN1_REG) >> (KEYBOARD_CLK- 32))==1)
  {
   return;
  }
 
- val = digitalRead(KEYBOARD_DATA);
+ //val = digitalRead(KEYBOARD_DATA);
+ val = (REG_READ(GPIO_IN1_REG) >> (KEYBOARD_DATA- 32))&0x01;
  now_ms = millis(); 
  if ((now_ms - gb_kb_prev_ms) > 250)
  {
@@ -67,13 +72,14 @@ void IRAM_ATTR kb_interruptHandler()
   //{
    if (keyup == 1) 
    {//Se libera tecla pasa a 1
-    if (keymap[gb_kb_incoming] == 0) 
+    //if (keymap[gb_kb_incoming] == 0) 
+    if (((gb_keymap[(gb_kb_incoming>>3)]>>(gb_kb_incoming & 0x07)) & 0x01) == 0)
     {
      //auxId= gb_kb_incoming>>3; //DIV 8
      //auxOffs= gb_kb_incoming & 0x07; //MOD 8
      //unsigned char antes= keymap[auxId];
      //antes= antes | (1<<auxOffs);
-     keymap[(gb_kb_incoming>>3)] |= (1<<(gb_kb_incoming & 0x07));
+     gb_keymap[(gb_kb_incoming>>3)] |= (1<<(gb_kb_incoming & 0x07));
 
      //keymap[gb_kb_incoming]= 1;
     }
@@ -85,7 +91,11 @@ void IRAM_ATTR kb_interruptHandler()
      // keymap[gg]= 1;
      //}
      
-     memset((void *)keymap,0xFF,sizeof(keymap));
+     //memset((void *)keymap,0xFF,sizeof(keymap));
+     for (unsigned char gg = 0; gg < gb_max_keymap32; gg++)
+     {      
+      gb_keymap32[gg]=(unsigned int)0xFFFFFFFF;
+     }     
 
      //memset((void *)keymap,1,sizeof(keymap));
     }
@@ -97,7 +107,7 @@ void IRAM_ATTR kb_interruptHandler()
     //auxOffs= gb_kb_incoming & 0x07; //MOD 8
     //unsigned char antes= keymap[auxId];
     //antes= antes & ((~(1<<auxOffs)) & 0xFF);
-    keymap[(gb_kb_incoming>>3)] &= ((~(1<<(gb_kb_incoming & 0x07))) & 0xFF);
+    gb_keymap[(gb_kb_incoming>>3)] &= ((~(1<<(gb_kb_incoming & 0x07))) & 0xFF);
     //9 div 8 = 1   resto 1
 
     //keymap[gb_kb_incoming] = 0;
@@ -142,12 +152,13 @@ void kb_begin()
 //  ps2boot.terminate();
 // #endif
 
+    memset((void *)gb_keymap, 0xFF, sizeof(gb_keymap));
+
     pinMode(KEYBOARD_DATA, INPUT_PULLUP);
     pinMode(KEYBOARD_CLK, INPUT_PULLUP);
     digitalWrite(KEYBOARD_DATA, true);
     digitalWrite(KEYBOARD_CLK, true);
-
-    memset((void *)keymap, 0xFF, sizeof(keymap));
+    
     
     //memset((void *)keymap, 1, sizeof(keymap));
 
@@ -170,14 +181,14 @@ unsigned char checkAndCleanKey(unsigned char scancode)
  //unsigned char tecla= keymap[auxId];
  //unsigned char valor= (tecla>>auxOffs)&0x01;
 
- unsigned char valor= ((keymap[auxId])>>auxOffs)&0x01;
+ unsigned char valor= ((gb_keymap[auxId])>>auxOffs)&0x01;
 
  if (valor == 0)
  {
   //keymap[scancode] = 1;  
   //tecla= tecla | (1<<auxOffs);
   //keymap[auxId] = tecla;
-  keymap[auxId] |= (1<<auxOffs);
+  gb_keymap[auxId] |= (1<<auxOffs);
 
   return 1;     
  }
