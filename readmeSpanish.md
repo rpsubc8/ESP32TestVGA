@@ -109,7 +109,7 @@ Debemos desactivar la opción de PSRAM, y en caso de superar 1 MB de binario, se
 
 <br><br>
 <h1>Test teclado PS/2</h1>
-Para testear un teclado PS/2:
+Para testear un teclado PS/2:<br><br>
 <a href='https://github.com/rpsubc8/testkeyboardPS2'>https://github.com/rpsubc8/testkeyboardPS2</a>
 
 
