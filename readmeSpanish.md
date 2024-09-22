@@ -107,6 +107,10 @@ Ya está preparado el proyecto, de forma que no se necesita ninguna librería de
 Debemos desactivar la opción de PSRAM, y en caso de superar 1 MB de binario, seleccionar 4 MB de partición a la hora de subir. Aunque el código no use PSRAM, si la opción está activa y nuestro ESP32 no dispone de ella, se generará una excepción y reinicio del mismo en modo bucle.
 
 
+<br><br>
+<h1>Test teclado PS/2</h1>
+Para testear un teclado PS/2:
+<a href='https://github.com/rpsubc8/testkeyboardPS2'>https://github.com/rpsubc8/testkeyboardPS2</a>
 
 
 <br><br>
